@@ -23,6 +23,7 @@ thiserror = "1.0.13"
 # We specify them to tighten their version requirements so that builds with `-Zminimal-versions` work.
 # Once we bump `cosmwasm-*` deps to a version after `1.1.5`, we can remove these.
 k256 = { version = "0.11.1", features = ["ecdsa"] }
+anyhow = "1.0.41"
 
 [dev-dependencies]
 cw-storage-plus = "0.16"

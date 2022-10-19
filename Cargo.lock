@@ -198,6 +198,7 @@ dependencies = [
 name = "cw-utils"
 version = "0.16.0"
 dependencies = [
+ "anyhow",
  "cosmwasm-schema",
  "cosmwasm-std",
  "cw-storage-plus",
