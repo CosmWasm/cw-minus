@@ -17,8 +17,18 @@ cw2 = "0.16"
 schemars = "0.8.1"
 semver = "1"
 serde = { version = "1.0.0", default-features = false, features = ["derive"] }
-thiserror = "1.0.0"
+thiserror = "1.0.13"
+
+# We don't use the following dependencies directly. They're dependencies of our dependencies.
+# We specify them to tighten their version requirements so that builds with `-Zminimal-versions` work.
+# Once we bump `cosmwasm-*` deps to a version after `1.1.5`, we can remove these.
+k256 = { version = "0.11.1", features = ["ecdsa"] }
 
 [dev-dependencies]
 cw-storage-plus = "0.16"
 prost = "0.9"
+
+# We don't use the following dependencies directly. They're dependencies of our dependencies.
+# We specify them to tighten their version requirements so that builds with `-Zminimal-versions` work.
+# Once we bump `cosmwasm-*` deps to a version after `1.1.5`, we can remove these.
+serde_json = "1.0.40"

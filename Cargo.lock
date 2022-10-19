@@ -202,10 +202,12 @@ dependencies = [
  "cosmwasm-std",
  "cw-storage-plus",
  "cw2",
+ "k256",
  "prost",
  "schemars",
  "semver",
  "serde",
+ "serde_json",
  "thiserror",
 ]
 
