@@ -2,7 +2,7 @@
 name = "cw-utils"
 version = "0.16.0"
 authors = ["Ethan Frey <ethanfrey@users.noreply.github.com>"]
-edition = "2018"
+edition = "2021"
 description = "Common helpers for other cw specs"
 license = "Apache-2.0"
 repository = "https://github.com/CosmWasm/cw-plus"
@@ -11,14 +11,14 @@ homepage = "https://cosmwasm.com"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-cosmwasm-schema = "=1.0.0"
-cosmwasm-std = "=1.0.0"
-cw2 = { version = "0.16", path = "../cw-plus/packages/cw2"}
+cosmwasm-schema = "1.0.0"
+cosmwasm-std = "1.0.0"
+cw2 = "0.16"
 schemars = "0.8.1"
 semver = "1"
 serde = { version = "1.0.0", default-features = false, features = ["derive"] }
-thiserror = "=1.0.0"
+thiserror = "1.0.0"
 
 [dev-dependencies]
-cw-storage-plus = {version = "0.16", path = "../cw-storage-plus"}
+cw-storage-plus = "0.16"
 prost = "0.9"
