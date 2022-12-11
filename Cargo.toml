@@ -1,6 +1,6 @@
 [package]
 name = "cw-utils"
-version = "1.0.0"
+version = "1.0.1"
 authors = ["Ethan Frey <ethanfrey@users.noreply.github.com>"]
 edition = "2021"
 description = "Common helpers for other cw specs"
