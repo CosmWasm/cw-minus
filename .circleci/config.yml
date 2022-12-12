@@ -10,7 +10,10 @@ workflows:
       - build_and_test
       - build_minimal
       - build_maximal
-      - lint
+      - lint:
+          matrix:
+            parameters:
+              rust-version: ["1.59.0", "1.65.0"]
       - coverage
   nightly:
     triggers:
@@ -120,8 +123,11 @@ jobs:
           key: cargocache-v2-utils:1.64.0-{{ checksum "Cargo.lock" }}
 
   lint:
+    parameters:
+      rust-version:
+        type: string
     docker:
-      - image: rust:1.64.0
+      - image: rust:<< parameters.rust-version >>
     steps:
       - checkout
       - run:
@@ -132,8 +138,8 @@ jobs:
           command: cargo update
       - restore_cache:
           keys:
-            - cargocache-v2-lint-rust:1.64.0-{{ checksum "Cargo.lock" }}
-            - cargocache-v2-lint-rust:1.64.0-
+            - cargocache-v2-lint-rust:<< parameters.rust-version >>-{{ checksum "Cargo.lock" }}
+            - cargocache-v2-lint-rust:<< parameters.rust-version >>-
       - run:
           name: Add rustfmt component
           command: rustup component add rustfmt
@@ -152,7 +158,7 @@ jobs:
             - target/debug/.fingerprint
             - target/debug/build
             - target/debug/deps
-          key: cargocache-v2-lint-rust:1.64.0-{{ checksum "Cargo.lock" }}
+          key: cargocache-v2-lint-rust:<< parameters.rust-version >>-{{ checksum "Cargo.lock" }}
 
   coverage:
     # https://circleci.com/developer/images?imageType=machine
