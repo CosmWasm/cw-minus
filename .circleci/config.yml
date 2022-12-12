@@ -51,6 +51,12 @@ jobs:
           name: Build library for native target
           command: cargo build --locked
       - run:
+          name: Build library for Wasm target (default features)
+          command: cargo build --target wasm32-unknown-unknown --locked
+      - run:
+          name: Build library for Wasm target (all features)
+          command: cargo build --target wasm32-unknown-unknown --locked --all-features
+      - run:
           name: Run unit tests
           command: cargo test --locked
       - save_cache:
@@ -77,12 +83,6 @@ jobs:
       - run:
           name: Build library for native target
           command: cargo build -Zminimal-versions --all-features
-      - run:
-          name: Build library for Wasm target (default features)
-          command: cargo build --target wasm32-unknown-unknown --locked
-      - run:
-          name: Build library for Wasm target (all features)
-          command: cargo build --target wasm32-unknown-unknown --locked --all-features
       - run:
           name: Run unit tests
           command: cargo test --workspace -Zminimal-versions --all-features
