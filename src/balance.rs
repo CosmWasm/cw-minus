@@ -147,6 +147,16 @@ impl ops::Sub<Coin> for NativeBalance {
     fn sub(mut self, other: Coin) -> StdResult<Self> {
         match self.find(&other.denom) {
             Some((i, c)) => {
+                if c.amount < other.amount {
+                    return Err(StdError::GenericErr {
+                        msg: format!(
+                            "Insufficient balance. Wanted: {}, Available: {}",
+                            other.amount,
+                            c.amount
+                        )
+                    });
+                }
+                
                 let remainder = c.amount.checked_sub(other.amount)?;
                 if remainder.u128() == 0 {
                     self.0.remove(i);
@@ -156,11 +166,9 @@ impl ops::Sub<Coin> for NativeBalance {
             }
             // error if no tokens
             None => {
-                return Err(StdError::overflow(OverflowError::new(
-                    OverflowOperation::Sub,
-                    0,
-                    other.amount.u128(),
-                )))
+                return Err(StdError::GenericErr {
+                    msg: format!("Insufficient balance. Wanted: {}, Available: 0", other.amount)
+                });                
             }
         };
         Ok(self)
