@@ -1,5 +1,11 @@
 # Changelog
 
+## [Unreleased]
+
+### Added
+
+- `exact_funds_sent()` helper to assert the exact funds in `MessageInfo`.
+
 ## [v1.0.0](https://github.com/CosmWasm/cw-utils/tree/v1.0.0) (2022-11-23)
 
 [Full Changelog](https://github.com/CosmWasm/cw-utils/compare/v0.16.0...v1.0.0)

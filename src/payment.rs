@@ -1,4 +1,5 @@
 use cosmwasm_std::{Coin, MessageInfo, Uint128};
+use std::collections::HashSet;
 use thiserror::Error;
 
 /// returns an error if any coins were sent
@@ -52,6 +53,32 @@ pub fn may_pay(info: &MessageInfo, denom: &str) -> Result<Uint128, PaymentError>
     }
 }
 
+fn stringify_coins(coins: &[Coin]) -> String {
+    match coins {
+        [] => "None".to_string(),
+        _ => coins
+            .iter()
+            .map(ToString::to_string)
+            .collect::<Vec<_>>()
+            .join(", "),
+    }
+}
+
+/// Assert that exact coins & amount were sent along with a message
+pub fn exact_funds_sent(info: &MessageInfo, expected: &[Coin]) -> Result<(), PaymentError> {
+    let same_quantity = info.funds.len() == expected.len();
+    let expected_hash_set: HashSet<_> = expected.iter().map(|c| c.to_string()).collect();
+    let message_funds_hash_set: HashSet<_> = info.funds.iter().map(|c| c.to_string()).collect();
+
+    if !same_quantity || expected_hash_set != message_funds_hash_set {
+        return Err(PaymentError::FundsMismatch {
+            expected: stringify_coins(expected),
+            received: stringify_coins(&info.funds),
+        });
+    }
+    Ok(())
+}
+
 #[derive(Error, Debug, PartialEq, Eq)]
 pub enum PaymentError {
     #[error("Must send reserve token '{0}'")]
@@ -68,6 +95,9 @@ pub enum PaymentError {
 
     #[error("This message does no accept funds")]
     NonPayable {},
+
+    #[error("Sent funds mismatch. Expected: {expected:?}, received {received:?}")]
+    FundsMismatch { expected: String, received: String },
 }
 
 #[cfg(test)]
@@ -132,5 +162,115 @@ mod test {
 
         let err = must_pay(&mixed_payment, atom).unwrap_err();
         assert_eq!(err, PaymentError::MultipleDenoms {});
+    }
+
+    #[test]
+    fn exact_funds_sent_success() {
+        let message_info = mock_info(
+            SENDER,
+            &[coin(50, "uosmo"), coin(42, "umars"), coin(120, "uatom")],
+        );
+        let expected = vec![coin(50, "uosmo"), coin(42, "umars"), coin(120, "uatom")];
+        exact_funds_sent(&message_info, &expected).unwrap();
+
+        // Re-order does not matter
+        let expected = vec![coin(42, "umars"), coin(50, "uosmo"), coin(120, "uatom")];
+        exact_funds_sent(&message_info, &expected).unwrap();
+
+        // When sent & expected none
+        let message_info = mock_info(SENDER, &[]);
+        exact_funds_sent(&message_info, &[]).unwrap();
+    }
+
+    #[test]
+    fn exact_funds_sent_when_expected_more() {
+        // When sent none
+        let message_info = mock_info(SENDER, &[]);
+        let expected = vec![coin(50, "uosmo"), coin(120, "uatom")];
+        let err = exact_funds_sent(&message_info, &expected).unwrap_err();
+        assert_eq!(
+            err,
+            PaymentError::FundsMismatch {
+                expected: "50uosmo, 120uatom".to_string(),
+                received: "None".to_string()
+            }
+        );
+
+        // When sent all correct, but missing one
+        let message_info = mock_info(SENDER, &[coin(50, "uosmo"), coin(120, "uatom")]);
+        let expected = vec![coin(50, "uosmo"), coin(120, "uatom"), coin(42, "umars")];
+        let err = exact_funds_sent(&message_info, &expected).unwrap_err();
+        assert_eq!(
+            err,
+            PaymentError::FundsMismatch {
+                expected: "50uosmo, 120uatom, 42umars".to_string(),
+                received: "50uosmo, 120uatom".to_string()
+            }
+        );
+    }
+
+    #[test]
+    fn exact_funds_sent_when_expected_less() {
+        // When expected none
+        let message_info = mock_info(SENDER, &[coin(50, "uosmo"), coin(120, "uatom")]);
+        let err = exact_funds_sent(&message_info, &[]).unwrap_err();
+        assert_eq!(
+            err,
+            PaymentError::FundsMismatch {
+                expected: "None".to_string(),
+                received: "50uosmo, 120uatom".to_string()
+            }
+        );
+
+        // When sent one extra
+        let message_info = mock_info(SENDER, &[coin(50, "uosmo"), coin(120, "uatom")]);
+        let expected = vec![coin(120, "uatom")];
+        let err = exact_funds_sent(&message_info, &expected).unwrap_err();
+        assert_eq!(
+            err,
+            PaymentError::FundsMismatch {
+                expected: "120uatom".to_string(),
+                received: "50uosmo, 120uatom".to_string()
+            }
+        );
+    }
+
+    #[test]
+    fn exact_funds_sent_when_expected_different_coins() {
+        let message_info = mock_info(SENDER, &[coin(50, "uosmo"), coin(120, "uatom")]);
+        let expected = vec![coin(42, "umars"), coin(11, "uxyz")];
+        let err = exact_funds_sent(&message_info, &expected).unwrap_err();
+        assert_eq!(
+            err,
+            PaymentError::FundsMismatch {
+                expected: "42umars, 11uxyz".to_string(),
+                received: "50uosmo, 120uatom".to_string()
+            }
+        );
+    }
+
+    #[test]
+    fn exact_funds_sent_when_duplicates() {
+        let message_info = mock_info(SENDER, &[coin(50, "uosmo"), coin(120, "uatom")]);
+        let expected = vec![coin(120, "uatom"), coin(120, "uatom")];
+        let err = exact_funds_sent(&message_info, &expected).unwrap_err();
+        assert_eq!(
+            err,
+            PaymentError::FundsMismatch {
+                expected: "120uatom, 120uatom".to_string(),
+                received: "50uosmo, 120uatom".to_string()
+            }
+        );
+
+        let message_info = mock_info(SENDER, &[coin(120, "uatom"), coin(120, "uatom")]);
+        let expected = vec![coin(50, "uosmo"), coin(120, "uatom")];
+        let err = exact_funds_sent(&message_info, &expected).unwrap_err();
+        assert_eq!(
+            err,
+            PaymentError::FundsMismatch {
+                expected: "50uosmo, 120uatom".to_string(),
+                received: "120uatom, 120uatom".to_string()
+            }
+        );
     }
 }
