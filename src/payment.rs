@@ -52,35 +52,33 @@ pub fn may_pay(info: &MessageInfo, denom: &str) -> Result<Uint128, PaymentError>
     }
 }
 
-pub fn must_pay_two_coins(
+pub fn must_pay_many(
     info: &MessageInfo,
-    first_denom: &str,
-    second_denom: &str,
-) -> Result<(Uint128, Uint128), PaymentError> {
+    required_denoms: &[&str],
+) -> Result<Vec<Uint128>, PaymentError> {
     if info.funds.is_empty() {
-        Err(PaymentError::NoFunds {})
-    } else if info.funds.len() == 1 && info.funds[0].denom == first_denom {
-        Err(PaymentError::MissingDenom(second_denom.to_string()))
-    } else if info.funds.len() == 1 && info.funds[0].denom == second_denom {
-        Err(PaymentError::MissingDenom(first_denom.to_string()))
-    } else if info.funds.len() == 2 {
-        let first_coin = match info.funds.iter().find(|c| c.denom == first_denom) {
-            Some(c) => c,
-            None => return Err(PaymentError::MissingDenom(first_denom.to_string())),
-        };
-        let second_coin = match info.funds.iter().find(|c| c.denom == second_denom) {
-            Some(c) => c,
-            None => return Err(PaymentError::MissingDenom(second_denom.to_string())),
-        };
-        Ok((first_coin.amount, second_coin.amount))
-    } else {
-        let wrong = info
-            .funds
-            .iter()
-            .find(|c| c.denom != first_denom && c.denom != second_denom)
-            .unwrap();
-        Err(PaymentError::ExtraDenom(wrong.denom.to_string()))
+        return Err(PaymentError::NoFunds {});
     }
+
+    if info.funds.len() != required_denoms.len() {
+        return Err(PaymentError::IncorrectNumberOfDenoms {});
+    }
+
+    let mut amounts: Vec<Uint128> = Vec::new();
+
+    for denom in required_denoms.iter() {
+        match info.funds.iter().find(|c| &c.denom == denom) {
+            Some(coin) => {
+                if coin.amount == Uint128::zero() {
+                    return Err(PaymentError::NoFunds {});
+                }
+                amounts.push(coin.amount);
+            }
+            None => return Err(PaymentError::MissingDenom(denom.to_string())),
+        }
+    }
+
+    Ok(amounts)
 }
 
 #[derive(Error, Debug, PartialEq, Eq)]
