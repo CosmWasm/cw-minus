@@ -52,6 +52,37 @@ pub fn may_pay(info: &MessageInfo, denom: &str) -> Result<Uint128, PaymentError>
     }
 }
 
+pub fn must_pay_two_coins(
+    info: &MessageInfo,
+    first_denom: &str,
+    second_denom: &str,
+) -> Result<(Uint128, Uint128), PaymentError> {
+    if info.funds.is_empty() {
+        Err(PaymentError::NoFunds {})
+    } else if info.funds.len() == 1 && info.funds[0].denom == first_denom {
+        Err(PaymentError::MissingDenom(second_denom.to_string()))
+    } else if info.funds.len() == 1 && info.funds[0].denom == second_denom {
+        Err(PaymentError::MissingDenom(first_denom.to_string()))
+    } else if info.funds.len() == 2 {
+        let first_coin = match info.funds.iter().find(|c| c.denom == first_denom) {
+            Some(c) => c,
+            None => return Err(PaymentError::MissingDenom(first_denom.to_string())),
+        };
+        let second_coin = match info.funds.iter().find(|c| c.denom == second_denom) {
+            Some(c) => c,
+            None => return Err(PaymentError::MissingDenom(second_denom.to_string())),
+        };
+        Ok((first_coin.amount, second_coin.amount))
+    } else {
+        let wrong = info
+            .funds
+            .iter()
+            .find(|c| c.denom != first_denom && c.denom != second_denom)
+            .unwrap();
+        Err(PaymentError::ExtraDenom(wrong.denom.to_string()))
+    }
+}
+
 #[derive(Error, Debug, PartialEq, Eq)]
 pub enum PaymentError {
     #[error("Must send reserve token '{0}'")]
@@ -132,5 +163,45 @@ mod test {
 
         let err = must_pay(&mixed_payment, atom).unwrap_err();
         assert_eq!(err, PaymentError::MultipleDenoms {});
+    }
+
+    #[test]
+    fn must_pay_two_coins_works() {
+        let atom: &str = "uatom";
+        let osmo: &str = "uosmo";
+        let eth: &str = "eth";
+        let no_payment = mock_info(SENDER, &[]);
+        let atom_payment = mock_info(SENDER, &coins(100, atom));
+        let osmo_payment = mock_info(SENDER, &coins(100, osmo));
+        let two_coin_payment = mock_info(SENDER, &[coin(50, atom), coin(120, eth)]);
+        let duplicate_coins_payment = mock_info(SENDER, &[coin(50, atom), coin(120, atom)]);
+        let three_coin_payment =
+            mock_info(SENDER, &[coin(50, atom), coin(120, eth), coin(120, osmo)]);
+
+        let (coin_one_amount, coin_two_amount) =
+            must_pay_two_coins(&two_coin_payment, atom, eth).unwrap();
+        assert_eq!(coin_one_amount, Uint128::new(50));
+        assert_eq!(coin_two_amount, Uint128::new(120));
+
+        let err = must_pay_two_coins(&duplicate_coins_payment, atom, osmo).unwrap_err();
+        assert_eq!(err, PaymentError::MissingDenom(osmo.to_string()));
+
+        let err = must_pay_two_coins(&no_payment, atom, osmo).unwrap_err();
+        assert_eq!(err, PaymentError::NoFunds {});
+
+        let err = must_pay_two_coins(&atom_payment, atom, osmo).unwrap_err();
+        assert_eq!(err, PaymentError::MissingDenom(osmo.to_string()));
+
+        let err = must_pay_two_coins(&osmo_payment, atom, osmo).unwrap_err();
+        assert_eq!(err, PaymentError::MissingDenom(atom.to_string()));
+
+        let err = must_pay_two_coins(&two_coin_payment, atom, osmo).unwrap_err();
+        assert_eq!(err, PaymentError::MissingDenom(osmo.to_string()));
+
+        let err = must_pay_two_coins(&three_coin_payment, osmo, atom).unwrap_err();
+        assert_eq!(err, PaymentError::ExtraDenom(eth.to_string()));
+
+        let err = must_pay_two_coins(&two_coin_payment, osmo, atom).unwrap_err();
+        assert_eq!(err, PaymentError::MissingDenom(osmo.to_string()));
     }
 }
