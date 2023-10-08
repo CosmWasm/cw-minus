@@ -1,4 +1,5 @@
 use cosmwasm_std::{Coin, MessageInfo, Uint128};
+use std::collections::HashMap;
 use thiserror::Error;
 
 /// returns an error if any coins were sent
@@ -55,30 +56,34 @@ pub fn may_pay(info: &MessageInfo, denom: &str) -> Result<Uint128, PaymentError>
 pub fn must_pay_many(
     info: &MessageInfo,
     required_denoms: &[&str],
-) -> Result<Vec<Uint128>, PaymentError> {
+) -> Result<Vec<Coin>, PaymentError> {
     if info.funds.is_empty() {
         return Err(PaymentError::NoFunds {});
     }
-
     if info.funds.len() != required_denoms.len() {
-        return Err(PaymentError::IncorrectNumberOfDenoms {});
+        return Err(PaymentError::IncorrectNumberOfDenoms(required_denoms.len()));
     }
 
-    let mut amounts: Vec<Uint128> = Vec::new();
+    let mut funds_map = HashMap::new();
+    for coin in &info.funds {
+        if funds_map.insert(coin.denom.as_str(), coin).is_some() {
+            return Err(PaymentError::DuplicateDenom(coin.denom.clone()));
+        }
+    }
 
-    for denom in required_denoms.iter() {
-        match info.funds.iter().find(|c| &c.denom == denom) {
+    let mut matched_coins: Vec<Coin> = Vec::new();
+    for &denom in required_denoms {
+        match funds_map.get(denom) {
             Some(coin) => {
                 if coin.amount == Uint128::zero() {
-                    return Err(PaymentError::NoFunds {});
+                    return Err(PaymentError::ZeroAmountDenom(denom.to_string()));
                 }
-                amounts.push(coin.amount);
+                matched_coins.push((**coin).clone());
             }
             None => return Err(PaymentError::MissingDenom(denom.to_string())),
         }
     }
-
-    Ok(amounts)
+    Ok(matched_coins)
 }
 
 #[derive(Error, Debug, PartialEq, Eq)]
@@ -98,8 +103,14 @@ pub enum PaymentError {
     #[error("This message does no accept funds")]
     NonPayable {},
 
-    #[error("Must send required denoms")]
-    IncorrectNumberOfDenoms {},
+    #[error("Must send '{0}' denoms")]
+    IncorrectNumberOfDenoms(usize),
+
+    #[error("Zero amound sent for '{0}'")]
+    ZeroAmountDenom(String),
+
+    #[error("Received duplicate denom '{0}'")]
+    DuplicateDenom(String),
 }
 
 #[cfg(test)]
@@ -147,6 +158,8 @@ mod test {
 
         let no_payment = mock_info(SENDER, &[]);
         let atom_payment = mock_info(SENDER, &coins(100, atom));
+        let zero_amount_payment = mock_info(SENDER, &[coin(0, atom), coin(120, eth)]);
+        let duplicate_atom_payment = mock_info(SENDER, &[coin(50, atom), coin(120, atom)]);
         let eth_payment = mock_info(SENDER, &coins(100, eth));
         let mixed_payment = mock_info(SENDER, &[coin(50, atom), coin(120, eth)]);
 
@@ -154,20 +167,19 @@ mod test {
         assert_eq!(err, PaymentError::NoFunds {});
 
         let err = must_pay_many(&atom_payment, &[atom, eth]).unwrap_err();
-        assert_eq!(err, PaymentError::IncorrectNumberOfDenoms {});
+        assert_eq!(err, PaymentError::IncorrectNumberOfDenoms(2));
+
+        let err = must_pay_many(&duplicate_atom_payment, &[atom, eth]).unwrap_err();
+        assert_eq!(err, PaymentError::DuplicateDenom(atom.to_string()));
+
+        let err = must_pay_many(&zero_amount_payment, &[atom, eth]).unwrap_err();
+        assert_eq!(err, PaymentError::ZeroAmountDenom(atom.to_string()));
 
         let err = must_pay_many(&eth_payment, &[atom]).unwrap_err();
         assert_eq!(err, PaymentError::MissingDenom(atom.to_string()));
 
-        let err = must_pay_many(&mixed_payment, &[atom]).unwrap_err();
-        assert_eq!(err, PaymentError::IncorrectNumberOfDenoms {});
-
         let res = must_pay_many(&mixed_payment, &[atom, eth]).unwrap();
-        assert_eq!(res, vec![Uint128::new(50), Uint128::new(120)]);
-
-        let zero_atom_payment = mock_info(SENDER, &coins(0, atom));
-        let err = must_pay_many(&zero_atom_payment, &[atom]).unwrap_err();
-        assert_eq!(err, PaymentError::NoFunds {});
+        assert_eq!(res, vec![coin(50, atom), coin(120, eth)]);
     }
 
     #[test]
