@@ -29,6 +29,7 @@ pub use payment::{may_pay, must_pay, nonpayable, one_coin, PaymentError};
 pub use threshold::{Threshold, ThresholdError, ThresholdResponse};
 
 pub use crate::balance::NativeBalance;
+#[allow(deprecated)]
 pub use crate::event::Event;
 pub use crate::expiration::{Duration, Expiration, DAY, HOUR, WEEK};
 pub use crate::scheduled::Scheduled;
