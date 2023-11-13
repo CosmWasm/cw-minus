@@ -5,6 +5,7 @@ use semver::Version;
 /// This function not only validates that the right contract and version can be migrated, but also
 /// updates the contract version from the original (stored) version to the new version.
 /// It returns the original version for the convenience of doing external checks.
+#[deprecated(note = "Use cw2::ensure_from_older_version, which is an equivalent of this function.")]
 pub fn ensure_from_older_version(
     storage: &mut dyn Storage,
     name: &str,
@@ -39,6 +40,7 @@ fn from_semver(err: semver::Error) -> StdError {
 }
 
 #[cfg(test)]
+#[allow(deprecated)]
 mod tests {
     use super::*;
     use cosmwasm_std::testing::MockStorage;
