@@ -16,6 +16,7 @@ mod payment;
 mod scheduled;
 mod threshold;
 
+#[allow(deprecated)]
 pub use migrate::ensure_from_older_version;
 pub use pagination::{
     calc_range_end, calc_range_start, calc_range_start_string, maybe_addr, maybe_canonical,
