@@ -7,17 +7,13 @@ a second contract, not "because we might need it"
 */
 
 mod balance;
-mod event;
 mod expiration;
-mod migrate;
 mod pagination;
 mod parse_reply;
 mod payment;
 mod scheduled;
 mod threshold;
 
-#[allow(deprecated)]
-pub use migrate::ensure_from_older_version;
 pub use pagination::{
     calc_range_end, calc_range_start, calc_range_start_string, maybe_addr, maybe_canonical,
 };
@@ -30,7 +26,5 @@ pub use payment::{may_pay, must_pay, nonpayable, one_coin, PaymentError};
 pub use threshold::{Threshold, ThresholdError, ThresholdResponse};
 
 pub use crate::balance::NativeBalance;
-#[allow(deprecated)]
-pub use crate::event::Event;
 pub use crate::expiration::{Duration, Expiration, DAY, HOUR, WEEK};
 pub use crate::scheduled::Scheduled;
