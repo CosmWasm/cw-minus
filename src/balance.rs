@@ -82,8 +82,6 @@ impl NativeBalance {
             None => {
                 return Err(StdError::overflow(OverflowError::new(
                     OverflowOperation::Sub,
-                    0,
-                    other.amount.u128(),
                 )))
             }
         };
@@ -158,8 +156,6 @@ impl ops::Sub<Coin> for NativeBalance {
             None => {
                 return Err(StdError::overflow(OverflowError::new(
                     OverflowOperation::Sub,
-                    0,
-                    other.amount.u128(),
                 )))
             }
         };
