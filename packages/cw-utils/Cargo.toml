@@ -5,7 +5,7 @@ authors = ["Ethan Frey <ethanfrey@users.noreply.github.com>"]
 edition = "2021"
 description = "Common helpers for other cw specs"
 license = "Apache-2.0"
-repository = "https://github.com/CosmWasm/cw-utils"
+repository = "https://github.com/CosmWasm/cw-minus"
 homepage = "https://cosmwasm.com"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
