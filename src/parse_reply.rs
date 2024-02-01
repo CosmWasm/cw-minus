@@ -1,6 +1,6 @@
 use thiserror::Error;
 
-use cosmwasm_std::{Binary, Reply};
+use cosmwasm_std::Binary;
 
 // Protobuf wire types (https://developers.google.com/protocol-buffers/docs/encoding)
 const WIRE_TYPE_LENGTH_DELIMITED: u8 = 2;
@@ -99,30 +99,8 @@ fn parse_protobuf_bytes(
     if bytes_field.is_empty() {
         Ok(None)
     } else {
-        Ok(Some(Binary(bytes_field)))
+        Ok(Some(Binary::new(bytes_field)))
     }
-}
-
-pub fn parse_reply_instantiate_data(
-    msg: Reply,
-) -> Result<MsgInstantiateContractResponse, ParseReplyError> {
-    let data = msg
-        .result
-        .into_result()
-        .map_err(ParseReplyError::SubMsgFailure)?
-        .data
-        .ok_or_else(|| ParseReplyError::ParseFailure("Missing reply data".to_owned()))?;
-    parse_instantiate_response_data(&data.0)
-}
-
-pub fn parse_reply_execute_data(msg: Reply) -> Result<MsgExecuteContractResponse, ParseReplyError> {
-    let data = msg
-        .result
-        .into_result()
-        .map_err(ParseReplyError::SubMsgFailure)?
-        .data
-        .ok_or_else(|| ParseReplyError::ParseFailure("Missing reply data".to_owned()))?;
-    parse_execute_response_data(&data.0)
 }
 
 pub fn parse_instantiate_response_data(
@@ -168,7 +146,6 @@ pub enum ParseReplyError {
 mod test {
     use super::*;
     use crate::parse_reply::ParseReplyError::{BrokenUtf8, ParseFailure};
-    use cosmwasm_std::{SubMsgResponse, SubMsgResult};
     use prost::Message;
     use std::str::from_utf8;
 
@@ -326,14 +303,14 @@ mod test {
         let mut encoded_data = encode_bytes(&data);
 
         let res = parse_protobuf_bytes(&mut encoded_data, field_number).unwrap();
-        assert_eq!(res, Some(Binary(data)));
+        assert_eq!(res, Some(Binary::new(data)));
 
         // Large works
         let data = vec![0x40; 300];
         let mut encoded_data = encode_bytes(&data);
 
         let res = parse_protobuf_bytes(&mut encoded_data, field_number).unwrap();
-        assert_eq!(res, Some(Binary(data)));
+        assert_eq!(res, Some(Binary::new(data)));
 
         // Field number works
         let field_number = 5;
@@ -342,7 +319,7 @@ mod test {
         encoded_data[0] = (field_number << 3) + WIRE_TYPE_LENGTH_DELIMITED;
 
         let res = parse_protobuf_bytes(&mut encoded_data, field_number).unwrap();
-        assert_eq!(res, Some(Binary(data)));
+        assert_eq!(res, Some(Binary::new(data)));
 
         // Remainder is kept
         let field_number = 1;
@@ -352,7 +329,7 @@ mod test {
         encoded_data[1] = test_len as u8;
 
         let res = parse_protobuf_bytes(&mut encoded_data, field_number).unwrap();
-        assert_eq!(res, Some(Binary(data[..test_len].to_owned())));
+        assert_eq!(res, Some(Binary::new(data[..test_len].to_owned())));
         assert_eq!(encoded_data, data[test_len..].to_owned());
     }
 
@@ -413,7 +390,7 @@ mod test {
     }
 
     #[test]
-    fn parse_reply_instantiate_data_works() {
+    fn parse_instantiate_response_data_works() {
         let contract_addr: &str = "Contract #1";
         for (data, expected) in [
             (
@@ -427,28 +404,28 @@ mod test {
                 vec![1u8, 2, 255, 7, 5],
                 super::MsgInstantiateContractResponse {
                     contract_address: contract_addr.to_string(),
-                    data: Some(Binary(vec![1u8, 2, 255, 7, 5])),
+                    data: Some(Binary::new(vec![1u8, 2, 255, 7, 5])),
                 },
             ),
             (
                 vec![1u8; 127],
                 super::MsgInstantiateContractResponse {
                     contract_address: contract_addr.to_string(),
-                    data: Some(Binary(vec![1u8; 127])),
+                    data: Some(Binary::new(vec![1u8; 127])),
                 },
             ),
             (
                 vec![2u8; 128],
                 super::MsgInstantiateContractResponse {
                     contract_address: contract_addr.to_string(),
-                    data: Some(Binary(vec![2u8; 128])),
+                    data: Some(Binary::new(vec![2u8; 128])),
                 },
             ),
             (
                 vec![3u8; 257],
                 super::MsgInstantiateContractResponse {
                     contract_address: contract_addr.to_string(),
-                    data: Some(Binary(vec![3u8; 257])),
+                    data: Some(Binary::new(vec![3u8; 257])),
                 },
             ),
         ] {
@@ -463,46 +440,38 @@ mod test {
                 .encode(&mut encoded_instantiate_reply)
                 .unwrap();
 
-            // Build reply message
-            let msg = Reply {
-                id: 1,
-                result: SubMsgResult::Ok(SubMsgResponse {
-                    events: vec![],
-                    data: Some(encoded_instantiate_reply.into()),
-                }),
-            };
+            let res = parse_instantiate_response_data(&encoded_instantiate_reply).unwrap();
 
-            let res = parse_reply_instantiate_data(msg).unwrap();
             assert_eq!(res, expected);
         }
     }
 
     #[test]
-    fn parse_reply_execute_data_works() {
+    fn parse_execute_response_data_works() {
         for (data, expected) in [
             (vec![], super::MsgExecuteContractResponse { data: None }),
             (
                 vec![1u8, 2, 3, 127, 15],
                 super::MsgExecuteContractResponse {
-                    data: Some(Binary(vec![1u8, 2, 3, 127, 15])),
+                    data: Some(Binary::new(vec![1u8, 2, 3, 127, 15])),
                 },
             ),
             (
                 vec![0u8; 255],
                 super::MsgExecuteContractResponse {
-                    data: Some(Binary(vec![0u8; 255])),
+                    data: Some(Binary::new(vec![0u8; 255])),
                 },
             ),
             (
                 vec![1u8; 256],
                 super::MsgExecuteContractResponse {
-                    data: Some(Binary(vec![1u8; 256])),
+                    data: Some(Binary::new(vec![1u8; 256])),
                 },
             ),
             (
                 vec![2u8; 32769],
                 super::MsgExecuteContractResponse {
-                    data: Some(Binary(vec![2u8; 32769])),
+                    data: Some(Binary::new(vec![2u8; 32769])),
                 },
             ),
         ] {
@@ -511,16 +480,7 @@ mod test {
             // The data must encode successfully
             execute_reply.encode(&mut encoded_execute_reply).unwrap();
 
-            // Build reply message
-            let msg = Reply {
-                id: 1,
-                result: SubMsgResult::Ok(SubMsgResponse {
-                    events: vec![],
-                    data: Some(encoded_execute_reply.into()),
-                }),
-            };
-
-            let res = parse_reply_execute_data(msg).unwrap();
+            let res = parse_execute_response_data(&encoded_execute_reply).unwrap();
 
             assert_eq!(res, expected);
         }
