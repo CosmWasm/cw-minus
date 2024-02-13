@@ -6,7 +6,6 @@ edition = "2021"
 description = "Definition and types for the CosmWasm-2 interface"
 license = "Apache-2.0"
 repository = "https://github.com/CosmWasm/cw-minus"
-homepage = "https://cosmwasm.com"
 
 [dependencies]
 cosmwasm-schema = "1.4.0"
