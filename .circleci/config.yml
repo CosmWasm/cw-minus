@@ -7,9 +7,11 @@ workflows:
   version: 2
   test:
     jobs:
-      - build_and_test
-      - build_minimal
-      - build_maximal
+      - package_cw_utils_build_and_test
+      - package_cw_utils_build_minimal
+      - package_cw_utils_build_maximal
+      - package_controllers
+      - package_cw2
       - lint:
           matrix:
             parameters:
@@ -26,15 +28,15 @@ workflows:
                 - main
     jobs:
       # Build with minimal versions of dependencies
-      - build_minimal
+      - package_cw_utils_build_minimal
       # Build with maximal versions of dependencies
-      - build_maximal
+      - package_cw_utils_build_maximal
 
 jobs:
-  build_and_test:
+  package_cw_utils_build_and_test:
     docker:
       - image: rust:1.65.0
-    working_directory: ~/project
+    working_directory: ~/project/packages/cw-utils
     steps:
       - checkout
       - run:
@@ -68,10 +70,10 @@ jobs:
             - target
           key: cargocache-v2-utils:1.65.0-{{ checksum "Cargo.lock" }}
 
-  build_minimal:
+  package_cw_utils_build_minimal:
     docker:
       - image: rustlang/rust:nightly
-    working_directory: ~/project/
+    working_directory: ~/project/packages/cw-utils
     steps:
       - checkout
       - run:
@@ -95,10 +97,10 @@ jobs:
             - target
           key: cargocache-v2-utils:1.65.0-minimal-{{ checksum "Cargo.toml" }}
 
-  build_maximal:
+  package_cw_utils_build_maximal:
     docker:
       - image: rust:1.65.0
-    working_directory: ~/project/
+    working_directory: ~/project/packages/cw-utils
     steps:
       - checkout
       - run:
@@ -174,3 +176,54 @@ jobs:
               sh -c "cargo tarpaulin --workspace --skip-clean --frozen --out xml --output-dir cov"
       - codecov/upload:
           file: cov/cobertura.xml
+
+  package_cw2:
+    docker:
+      - image: rust:1.67.0
+    working_directory: ~/project/packages/cw2
+    steps:
+      - checkout:
+          path: ~/project
+      - run:
+          name: Version information
+          command: rustc --version; cargo --version; rustup --version; rustup target list --installed
+      - restore_cache:
+          keys:
+            - cargocache-v2-cw2:1.67.0-{{ checksum "~/project/Cargo.lock" }}
+      - run:
+          name: Build library for native target
+          command: cargo build --locked
+      - run:
+          name: Run unit tests
+          command: cargo test --locked
+      # note: there are no schemas to generate
+      - save_cache:
+          paths:
+            - /usr/local/cargo/registry
+            - target
+          key: cargocache-v2-cw2:1.67.0-{{ checksum "~/project/Cargo.lock" }}
+
+  package_controllers:
+    docker:
+      - image: rust:1.67.0
+    working_directory: ~/project/packages/controllers
+    steps:
+      - checkout:
+          path: ~/project
+      - run:
+          name: Version information
+          command: rustc --version; cargo --version; rustup --version; rustup target list --installed
+      - restore_cache:
+          keys:
+            - cargocache-v2-controllers:1.67.0-{{ checksum "~/project/Cargo.lock" }}
+      - run:
+          name: Build library for native target
+          command: cargo build --locked
+      - run:
+          name: Run unit tests
+          command: cargo test --locked
+      - save_cache:
+          paths:
+            - /usr/local/cargo/registry
+            - target
+          key: cargocache-v2-controllers:1.67.0-{{ checksum "~/project/Cargo.lock" }}
