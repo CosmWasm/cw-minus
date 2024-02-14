@@ -3,6 +3,8 @@
 ## Unreleased
 
 - chore: Create workspace [\#26](https://github.com/CosmWasm/cw-minus/pull/26)
+- chore: Remove CLA.md. Everything is this repo is Apache 2 licensed and there
+  is no intention to change that.
 
 ## [v2.0.0-rc.0](https://github.com/CosmWasm/cw-minus/tree/v2.0.0-rc.0) (2024-02-09)
 
@@ -20,7 +22,7 @@
 
 - Release 2.0.0-beta [\#24](https://github.com/CosmWasm/cw-minus/issues/24)
 - Remove deprecated symbols [\#20](https://github.com/CosmWasm/cw-minus/issues/20)
-- Deprecate and remove cw\_utils::Event [\#17](https://github.com/CosmWasm/cw-minus/issues/17)
+- Deprecate and remove cw_utils::Event [\#17](https://github.com/CosmWasm/cw-minus/issues/17)
 
 **Merged pull requests:**
 
