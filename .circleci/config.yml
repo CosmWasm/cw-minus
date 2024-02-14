@@ -85,6 +85,7 @@ jobs:
       - restore_cache:
           keys:
             - v3-cw-utils-rust:1.65.0-minimal-{{ checksum "Cargo.toml" }}
+            - v3-cw-utils-rust:1.65.0-minimal-
       - run:
           name: Build library for native target
           command: cargo build -Zminimal-versions --all-features
@@ -112,6 +113,7 @@ jobs:
       - restore_cache:
           keys:
             - v3-cw-utils-rust:1.65.0-{{ checksum "Cargo.lock" }}
+            - v3-cw-utils-rust:1.65.0-
       - run:
           name: Build library for native target
           command: cargo build --locked --all-features
@@ -190,6 +192,7 @@ jobs:
       - restore_cache:
           keys:
             - v3-cw2:1.67.0-{{ checksum "~/project/Cargo.lock" }}
+            - v3-cw2:1.67.0-
       - run:
           name: Build library for native target
           command: cargo build --locked
@@ -216,6 +219,7 @@ jobs:
       - restore_cache:
           keys:
             - v3-controllers:1.67.0-{{ checksum "~/project/Cargo.lock" }}
+            - v3-controllers:1.67.0-
       - run:
           name: Build library for native target
           command: cargo build --locked
