@@ -1,6 +1,6 @@
 use cosmwasm_schema::cw_serde;
 use cosmwasm_std::{Addr, BlockInfo, CustomQuery, Deps, StdResult, Storage, Uint128};
-use cw_storage_plus::Map;
+use cw_storage_plus::{Map, Namespace};
 use cw_utils::Expiration;
 
 // TODO: pull into utils?
@@ -26,11 +26,15 @@ impl Claim {
 }
 
 // TODO: revisit design (split each claim on own key?)
-pub struct Claims<'a>(Map<'a, &'a Addr, Vec<Claim>>);
+pub struct Claims(Map<&'static Addr, Vec<Claim>>);
 
-impl<'a> Claims<'a> {
-    pub const fn new(storage_key: &'a str) -> Self {
+impl Claims {
+    pub const fn new(storage_key: &'static str) -> Self {
         Claims(Map::new(storage_key))
+    }
+
+    pub fn new_dyn(storage_key: impl Into<Namespace>) -> Self {
+        Claims(Map::new_dyn(storage_key))
     }
 
     /// This creates a claim, such that the given address can claim an amount of tokens after
