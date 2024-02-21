@@ -4,6 +4,15 @@ members = ["packages/*"]
 # Resolver has to be set explicitely in workspaces, see https://github.com/rust-lang/cargo/issues/9956
 resolver = "2"
 
+[workspace.package]
+version = "2.0.0-rc.0"
+
+[workspace.dependencies]
+cw-utils = "2.0.0-rc.0"
+cosmwasm-schema = "2.0.0-rc.1"
+cosmwasm-std = { version = "2.0.0-rc.1", default-features = false, features = ["std"] }
+cw-storage-plus = "2.0.0-rc.0"
+
 [profile.release]
 rpath = false
 lto = true

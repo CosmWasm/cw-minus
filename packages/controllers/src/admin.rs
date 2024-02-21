@@ -6,7 +6,7 @@ use cosmwasm_schema::cw_serde;
 use cosmwasm_std::{
     attr, Addr, CustomQuery, Deps, DepsMut, MessageInfo, Response, StdError, StdResult,
 };
-use cw_storage_plus::Item;
+use cw_storage_plus::{Item, Namespace};
 
 // TODO: should the return values end up in utils, so eg. cw4 can import them as well as this module?
 /// Returned from Admin.query_admin()
@@ -26,12 +26,16 @@ pub enum AdminError {
 }
 
 // state/logic
-pub struct Admin<'a>(Item<'a, Option<Addr>>);
+pub struct Admin(Item<Option<Addr>>);
 
 // this is the core business logic we expose
-impl<'a> Admin<'a> {
-    pub const fn new(namespace: &'a str) -> Self {
+impl Admin {
+    pub const fn new(namespace: &'static str) -> Self {
         Admin(Item::new(namespace))
+    }
+
+    pub fn new_dyn(storage_key: impl Into<Namespace>) -> Self {
+        Admin(Item::new_dyn(storage_key))
     }
 
     pub fn set<Q: CustomQuery>(&self, deps: DepsMut<Q>, admin: Option<Addr>) -> StdResult<()> {
