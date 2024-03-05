@@ -50,7 +50,7 @@ jobs:
           command: cargo update
       - restore_cache:
           keys:
-            - v3-cw-utils-rust:1.70.0-{{ checksum "Cargo.lock" }}
+            - v3-cw-utils-rust:1.70.0-{{ checksum "~/project/Cargo.lock" }}
             - v3-cw-utils-rust:1.70.0-
       - run:
           name: Build library for native target
@@ -68,7 +68,7 @@ jobs:
           paths:
             - /usr/local/cargo/registry
             - target
-          key: v3-cw-utils-rust:1.70.0-{{ checksum "Cargo.lock" }}
+          key: v3-cw-utils-rust:1.70.0-{{ checksum "~/project/Cargo.lock" }}
 
   package_cw_utils_build_minimal:
     docker:
@@ -112,7 +112,7 @@ jobs:
           command: cargo update
       - restore_cache:
           keys:
-            - v3-cw-utils-rust:1.70.0-{{ checksum "Cargo.lock" }}
+            - v3-cw-utils-rust:1.70.0-{{ checksum "~/project/Cargo.lock" }}
             - v3-cw-utils-rust:1.70.0-
       - run:
           name: Build library for native target
@@ -124,7 +124,7 @@ jobs:
           paths:
             - /usr/local/cargo/registry
             - target
-          key: v3-cw-utils-rust:1.70.0-{{ checksum "Cargo.lock" }}
+          key: v3-cw-utils-rust:1.70.0-{{ checksum "~/project/Cargo.lock" }}
 
   lint:
     parameters:
@@ -142,7 +142,7 @@ jobs:
           command: cargo update
       - restore_cache:
           keys:
-            - v3-lint-rust:<< parameters.rust-version >>-{{ checksum "Cargo.lock" }}
+            - v3-lint-rust:<< parameters.rust-version >>-{{ checksum "~/project/Cargo.lock" }}
             - v3-lint-rust:<< parameters.rust-version >>-
       - run:
           name: Add rustfmt component
@@ -162,7 +162,7 @@ jobs:
             - target/debug/.fingerprint
             - target/debug/build
             - target/debug/deps
-          key: v3-lint-rust:<< parameters.rust-version >>-{{ checksum "Cargo.lock" }}
+          key: v3-lint-rust:<< parameters.rust-version >>-{{ checksum "~/project/Cargo.lock" }}
 
   coverage:
     # https://circleci.com/developer/images?imageType=machine
