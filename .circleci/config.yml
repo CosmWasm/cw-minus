@@ -191,8 +191,8 @@ jobs:
           command: rustc --version; cargo --version; rustup --version; rustup target list --installed
       - restore_cache:
           keys:
-            - v3-cw2:1.70.0-{{ checksum "~/project/Cargo.lock" }}
-            - v3-cw2:1.70.0-
+            - v3-cw2-rust:1.70.0-{{ checksum "~/project/Cargo.lock" }}
+            - v3-cw2-rust:1.70.0-
       - run:
           name: Build library for native target
           command: cargo build --locked
@@ -204,7 +204,7 @@ jobs:
           paths:
             - /usr/local/cargo/registry
             - target
-          key: v3-cw2:1.70.0-{{ checksum "~/project/Cargo.lock" }}
+          key: v3-cw2-rust:1.70.0-{{ checksum "~/project/Cargo.lock" }}
 
   package_controllers:
     docker:
@@ -218,8 +218,8 @@ jobs:
           command: rustc --version; cargo --version; rustup --version; rustup target list --installed
       - restore_cache:
           keys:
-            - v3-controllers:1.70.0-{{ checksum "~/project/Cargo.lock" }}
-            - v3-controllers:1.70.0-
+            - v3-controllers-rust:1.70.0-{{ checksum "~/project/Cargo.lock" }}
+            - v3-controllers-rust:1.70.0-
       - run:
           name: Build library for native target
           command: cargo build --locked
@@ -230,4 +230,4 @@ jobs:
           paths:
             - /usr/local/cargo/registry
             - target
-          key: v3-controllers:1.70.0-{{ checksum "~/project/Cargo.lock" }}
+          key: v3-controllers-rust:1.70.0-{{ checksum "~/project/Cargo.lock" }}
