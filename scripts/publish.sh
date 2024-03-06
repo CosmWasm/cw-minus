@@ -14,7 +14,7 @@ then
 fi
 
 # These are imported by other packages
-ALL_PACKAGES="controllers cw-utils cw2"
+ALL_PACKAGES="cw-utils controllers cw2"
 SLEEP_TIME=30
 
 for pack in $ALL_PACKAGES; do
