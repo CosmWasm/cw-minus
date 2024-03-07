@@ -1,5 +1,5 @@
 /*!
-Most of the CW* specs are focused on the *public interfaces*
+Most of the CW\* specs are focused on the _public interfaces_
 of the contract. The APIs used for `ExecuteMsg` or `QueryMsg`.
 However, when we wish to migrate or inspect smart contract info,
 we need some form of smart contract information embedded on state.
@@ -14,7 +14,7 @@ We do provide a helper to construct a "raw query" to read the ContractInfo
 of any CW2-compliant contract.
 
 For more information on this specification, please check out the
-[README](https://github.com/CosmWasm/cw-plus/blob/main/packages/cw2/README.md).
+[README](https://github.com/CosmWasm/cw-minus/blob/main/packages/cw2/README.md).
 */
 
 use cosmwasm_schema::cw_serde;
