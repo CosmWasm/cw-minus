@@ -66,7 +66,7 @@ pub enum PaymentError {
     #[error("No funds sent")]
     NoFunds {},
 
-    #[error("This message does no accept funds")]
+    #[error("This message does not accept funds")]
     NonPayable {},
 }
 
