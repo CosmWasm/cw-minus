@@ -8,12 +8,17 @@ a second contract, not "because we might need it"
 
 mod balance;
 mod expiration;
+mod external_storage;
 mod pagination;
 mod parse_reply;
 mod payment;
 mod scheduled;
 mod threshold;
 
+pub use crate::balance::NativeBalance;
+pub use crate::expiration::{Duration, Expiration, DAY, HOUR, WEEK};
+pub use crate::external_storage::ExternalStorage;
+pub use crate::scheduled::Scheduled;
 pub use pagination::{
     calc_range_end, calc_range_start, calc_range_start_string, maybe_addr, maybe_canonical,
 };
@@ -23,7 +28,3 @@ pub use parse_reply::{
 };
 pub use payment::{may_pay, must_pay, nonpayable, one_coin, PaymentError};
 pub use threshold::{Threshold, ThresholdError, ThresholdResponse};
-
-pub use crate::balance::NativeBalance;
-pub use crate::expiration::{Duration, Expiration, DAY, HOUR, WEEK};
-pub use crate::scheduled::Scheduled;
