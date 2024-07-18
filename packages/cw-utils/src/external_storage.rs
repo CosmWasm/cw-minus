@@ -53,7 +53,7 @@ impl<C: CustomQuery> Storage for ExternalStorage<'_, C> {
 mod tests {
     use super::*;
 
-    use cosmwasm_std::{testing::mock_dependencies, StdResult};
+    use cosmwasm_std::StdResult;
     use cw_multi_test::{App, Executor};
 
     mod storage_contract {
@@ -99,7 +99,7 @@ mod tests {
         fn query(deps: Deps, _: Env, _: Empty) -> StdResult<Binary> {
             // We'll call this in another instance, getting the value set in execute of the first instance
             let external_storage =
-                ExternalStorage::new(STORAGE_CONTRACT.load(deps.storage)?, deps.querier.clone());
+                ExternalStorage::new(STORAGE_CONTRACT.load(deps.storage)?, deps.querier);
 
             let value = MAP.load(&external_storage, "entry")?;
             to_json_binary(&value)
