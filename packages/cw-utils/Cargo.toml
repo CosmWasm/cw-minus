@@ -8,7 +8,7 @@ license = "Apache-2.0"
 repository = "https://github.com/CosmWasm/cw-minus"
 
 [features]
-iterator = ["cosmwasm-std/iterator"]
+iterator = ["cosmwasm-std/iterator", "cw-storage-plus/iterator"]
 
 [dependencies]
 cosmwasm-schema = { workspace = true }
@@ -21,7 +21,7 @@ thiserror = "1.0.49"
 cw-storage-plus = { workspace = true }
 cw-multi-test = { workspace = true }
 prost = "0.12.1"
-anyhow = "1.0.75"              # Not used directly but prost-derive does not set a sufficiently high anyhow version
+anyhow = "1.0.75"                      # Not used directly but prost-derive does not set a sufficiently high anyhow version
 
 # We don't use these dependencies directly,
 # we tighten versions that builds with `-Zminimal-versions` work.

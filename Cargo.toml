@@ -11,8 +11,8 @@ version = "2.0.0"
 cw-utils = { path = "packages/cw-utils", version = "2.0.0" }
 cosmwasm-schema = "2.0.0"
 cosmwasm-std = { version = "2.0.0", default-features = false, features = ["std"] }
-cw-storage-plus = "2.0.0"
-cw-multi-test = "2.1.0"
+cw-storage-plus = { version = "2.0.0", default-features = false }
+cw-multi-test = { version = "2.1.0", default-features = false }
 
 [profile.release]
 rpath = false
