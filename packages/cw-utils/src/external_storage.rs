@@ -30,7 +30,7 @@ impl<C: CustomQuery> Storage for ExternalStorage<'_, C> {
             .expect("external storage query failed")
     }
 
-    // TODO: feature-gate? #[cfg(feature = "iterator")]
+    #[cfg(feature = "iterator")]
     fn range<'a>(
         &'a self,
         _start: Option<&[u8]>,
