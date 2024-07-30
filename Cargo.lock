@@ -412,6 +412,7 @@ dependencies = [
  "anyhow",
  "cosmwasm-schema",
  "cosmwasm-std",
+ "curve25519-dalek",
  "cw-storage-plus",
  "ecdsa",
  "num-bigint",
