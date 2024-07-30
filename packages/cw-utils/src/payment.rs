@@ -73,28 +73,34 @@ pub enum PaymentError {
 #[cfg(test)]
 mod test {
     use super::*;
-    use cosmwasm_std::testing::mock_info;
+    use cosmwasm_std::testing::{message_info, mock_dependencies};
     use cosmwasm_std::{coin, coins};
 
     const SENDER: &str = "sender";
 
     #[test]
     fn nonpayable_works() {
-        let no_payment = mock_info(SENDER, &[]);
+        let deps = mock_dependencies();
+        let sender = deps.api.addr_make(SENDER);
+
+        let no_payment = message_info(&sender, &[]);
         nonpayable(&no_payment).unwrap();
 
-        let payment = mock_info(SENDER, &coins(100, "uatom"));
+        let payment = message_info(&sender, &coins(100, "uatom"));
         let res = nonpayable(&payment);
         assert_eq!(res.unwrap_err(), PaymentError::NonPayable {});
     }
 
     #[test]
     fn may_pay_works() {
+        let deps = mock_dependencies();
+        let sender = deps.api.addr_make(SENDER);
+
         let atom: &str = "uatom";
-        let no_payment = mock_info(SENDER, &[]);
-        let atom_payment = mock_info(SENDER, &coins(100, atom));
-        let eth_payment = mock_info(SENDER, &coins(100, "wei"));
-        let mixed_payment = mock_info(SENDER, &[coin(50, atom), coin(120, "wei")]);
+        let no_payment = message_info(&sender, &[]);
+        let atom_payment = message_info(&sender, &coins(100, atom));
+        let eth_payment = message_info(&sender, &coins(100, "wei"));
+        let mixed_payment = message_info(&sender, &[coin(50, atom), coin(120, "wei")]);
 
         let res = may_pay(&no_payment, atom).unwrap();
         assert_eq!(res, Uint128::zero());
@@ -111,12 +117,15 @@ mod test {
 
     #[test]
     fn must_pay_works() {
+        let deps = mock_dependencies();
+        let sender = deps.api.addr_make(SENDER);
+
         let atom: &str = "uatom";
-        let no_payment = mock_info(SENDER, &[]);
-        let atom_payment = mock_info(SENDER, &coins(100, atom));
-        let zero_payment = mock_info(SENDER, &coins(0, atom));
-        let eth_payment = mock_info(SENDER, &coins(100, "wei"));
-        let mixed_payment = mock_info(SENDER, &[coin(50, atom), coin(120, "wei")]);
+        let no_payment = message_info(&sender, &[]);
+        let atom_payment = message_info(&sender, &coins(100, atom));
+        let zero_payment = message_info(&sender, &coins(0, atom));
+        let eth_payment = message_info(&sender, &coins(100, "wei"));
+        let mixed_payment = message_info(&sender, &[coin(50, atom), coin(120, "wei")]);
 
         let res = must_pay(&atom_payment, atom).unwrap();
         assert_eq!(res, Uint128::new(100));
