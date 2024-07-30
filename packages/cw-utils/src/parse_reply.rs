@@ -43,7 +43,7 @@ fn parse_protobuf_varint(data: &mut Vec<u8>, field_number: u8) -> Result<usize, 
             field_number
         )));
     }
-    *data = data[i + 1..].to_owned();
+    let _ = data.drain(..=i);
 
     Ok(len as usize) // Gently fall back to the arch's max addressable size
 }
