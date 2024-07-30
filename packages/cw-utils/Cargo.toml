@@ -7,9 +7,6 @@ description = "Common helpers for other cw specs"
 license = "Apache-2.0"
 repository = "https://github.com/CosmWasm/cw-minus"
 
-[features]
-iterator = ["cosmwasm-std/iterator", "cw-storage-plus/iterator"]
-
 [dependencies]
 cosmwasm-schema = { workspace = true }
 cosmwasm-std = { workspace = true }

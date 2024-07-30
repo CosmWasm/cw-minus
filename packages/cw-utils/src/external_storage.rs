@@ -30,16 +30,6 @@ impl<C: CustomQuery> Storage for ExternalStorage<'_, C> {
             .expect("external storage query failed")
     }
 
-    #[cfg(feature = "iterator")]
-    fn range<'a>(
-        &'a self,
-        _start: Option<&[u8]>,
-        _end: Option<&[u8]>,
-        _order: cosmwasm_std::Order,
-    ) -> Box<dyn Iterator<Item = cosmwasm_std::Record> + 'a> {
-        panic!("cannot range over external storage");
-    }
-
     fn set(&mut self, _key: &[u8], _value: &[u8]) {
         panic!("cannot mutate external storage");
     }
