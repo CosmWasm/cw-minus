@@ -105,7 +105,7 @@ impl Admin {
 mod tests {
     use super::*;
 
-    use cosmwasm_std::testing::{mock_dependencies, mock_info};
+    use cosmwasm_std::testing::{message_info, mock_dependencies};
     use cosmwasm_std::Empty;
 
     #[test]
@@ -167,7 +167,7 @@ mod tests {
         assert_eq!(Some(owner.to_string()), res.admin);
 
         // imposter cannot update
-        let info = mock_info(imposter.as_ref(), &[]);
+        let info = message_info(&imposter, &[]);
         let new_admin = Some(friend.clone());
         let err = control
             .execute_update_admin::<Empty, Empty>(deps.as_mut(), info, new_admin.clone())
@@ -175,7 +175,7 @@ mod tests {
         assert_eq!(AdminError::NotAdmin {}, err);
 
         // owner can update
-        let info = mock_info(owner.as_ref(), &[]);
+        let info = message_info(&owner, &[]);
         let res = control
             .execute_update_admin::<Empty, Empty>(deps.as_mut(), info, new_admin)
             .unwrap();
