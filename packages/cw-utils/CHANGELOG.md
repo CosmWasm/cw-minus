@@ -2,7 +2,6 @@
 
 This changelog is archived and should be continued in the root of `cw-minus` repository.
 
-
 ## [v1.0.3](https://github.com/CosmWasm/cw-utils/tree/v1.0.3) (2023-11-23)
 
 [Full Changelog](https://github.com/CosmWasm/cw-utils/compare/v1.0.2...v1.0.3)
