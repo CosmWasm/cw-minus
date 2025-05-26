@@ -15,7 +15,7 @@ workflows:
       - lint:
           matrix:
             parameters:
-              rust-version: [ "1.72.0", "1.76.0" ]
+              rust-version: [ "1.81.0" ]
       - coverage
   nightly:
     triggers:
