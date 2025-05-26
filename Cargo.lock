@@ -412,6 +412,8 @@ dependencies = [
 [[package]]
 name = "cw-storage-plus"
 version = "3.0.0-ibc2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "2760a4c26a269ee94d1084d9def79d8d393d51a80d7c88d6f1654c9cab23f280"
 dependencies = [
  "cosmwasm-std",
  "schemars",
