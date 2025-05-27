@@ -252,7 +252,7 @@ mod test {
         );
 
         // subtract all of one type of coin
-        // that should not leave a 0 amount 
+        // that should not leave a 0 amount
         let no_btc = (balance.clone() - coin(555, "BTC")).unwrap();
         assert_eq!(no_btc, NativeBalance(vec![coin(12345, "ETH")]));
 
@@ -276,7 +276,8 @@ mod test {
             NativeBalance(vec![coin(555, "BTC"), coin(10000, "ETH")])
         );
 
-        // subtract all the one coin (and remove with 0 amount)
+        // subtract all of one type of coin
+        // that should not leave a 0 amount
         let no_btc = balance.clone().sub_saturating(coin(555, "BTC")).unwrap();
         assert_eq!(no_btc, NativeBalance(vec![coin(12345, "ETH")]));
 
