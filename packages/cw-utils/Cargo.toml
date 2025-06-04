@@ -14,16 +14,6 @@ schemars = { workspace = true }
 serde = { workspace = true }
 thiserror = { workspace = true }
 
-# We don't use these dependencies directly, but we specify versions that work with `-Zminimal-versions`.
-ahash = { version = "0.8.7", default-features = false }
-num-bigint = { version = "0.4.2", default-features = false }
-curve25519-dalek = { version = "4.1.2", default-features = false }
-
 [dev-dependencies]
 cw-storage-plus = { workspace = true }
 prost = "0.12.1"
-anyhow = "1.0.75"              # Not used directly but prost-derive does not set a sufficiently high anyhow version
-
-# We don't use these dependencies directly,
-# we tighten versions that builds with `-Zminimal-versions` work.
-ecdsa = "0.16.8"
