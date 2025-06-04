@@ -8,7 +8,6 @@ workflows:
   test:
     jobs:
       - package_cw_utils_build_and_test
-      - package_cw_utils_build_minimal
       - package_cw_utils_build_maximal
       - package_controllers
       - package_cw2
@@ -27,8 +26,6 @@ workflows:
               only:
                 - main
     jobs:
-      # Build with minimal versions of dependencies
-      - package_cw_utils_build_minimal
       # Build with maximal versions of dependencies
       - package_cw_utils_build_maximal
 
@@ -69,38 +66,6 @@ jobs:
             - /usr/local/cargo/registry
             - target
           key: v3-cw-utils-rust:1.81.0-{{ checksum "~/project/Cargo.lock" }}
-
-  package_cw_utils_build_minimal:
-    docker:
-      - image: rustlang/rust:nightly
-    working_directory: ~/project/packages/cw-utils
-    steps:
-      - checkout
-      - run:
-          name: Version information
-          command: rustc --version; cargo --version; rustup --version; rustup target list --installed
-      - run:
-          name: Remove Cargo.lock
-          command: rm Cargo.lock
-      # 👇 Remove this command after dependencies in crate num-bigint are upgraded!
-      - run:
-          name: Temporarily update problematic crate
-          command: cargo update -p num-bigint
-      - restore_cache:
-          keys:
-            - v3-cw-utils-rust:1.81.0-minimal-{{ checksum "Cargo.toml" }}
-            - v3-cw-utils-rust:1.81.0-minimal-
-      - run:
-          name: Build library for native target
-          command: cargo build -Zminimal-versions --all-features
-      - run:
-          name: Run unit tests
-          command: cargo test --workspace -Zminimal-versions --all-features
-      - save_cache:
-          paths:
-            - /usr/local/cargo/registry
-            - target
-          key: v3-cw-utils-rust:1.81.0-minimal-{{ checksum "Cargo.toml" }}
 
   package_cw_utils_build_maximal:
     docker:
