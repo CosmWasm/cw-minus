@@ -377,7 +377,7 @@ mod test {
 
         let res = parse_protobuf_string(&mut encoded_data, field_number).unwrap();
         assert_eq!(res, data[..test_len]);
-        assert_eq!(encoded_data, data[test_len..].as_bytes());
+        assert_eq!(encoded_data, &data.as_bytes()[test_len..]);
 
         // Broken utf-8 errs
         let field_number = 1;

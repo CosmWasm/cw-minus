@@ -1,4 +1,4 @@
-use cosmwasm_std::{Coin, MessageInfo, Uint128};
+use cosmwasm_std::{Coin, MessageInfo, Uint256};
 use thiserror::Error;
 
 /// returns an error if any coins were sent
@@ -29,7 +29,7 @@ pub fn one_coin(info: &MessageInfo) -> Result<Coin, PaymentError> {
 
 /// Requires exactly one denom sent, which matches the requested denom.
 /// Returns the amount if only one denom and non-zero amount. Errors otherwise.
-pub fn must_pay(info: &MessageInfo, denom: &str) -> Result<Uint128, PaymentError> {
+pub fn must_pay(info: &MessageInfo, denom: &str) -> Result<Uint256, PaymentError> {
     let coin = one_coin(info)?;
     if coin.denom != denom {
         Err(PaymentError::MissingDenom(denom.to_string()))
@@ -40,13 +40,13 @@ pub fn must_pay(info: &MessageInfo, denom: &str) -> Result<Uint128, PaymentError
 
 /// Similar to must_pay, but it any payment is optional. Returns an error if a different
 /// denom was sent. Otherwise, returns the amount of `denom` sent, or 0 if nothing sent.
-pub fn may_pay(info: &MessageInfo, denom: &str) -> Result<Uint128, PaymentError> {
+pub fn may_pay(info: &MessageInfo, denom: &str) -> Result<Uint256, PaymentError> {
     if info.funds.is_empty() {
-        Ok(Uint128::zero())
+        Ok(Uint256::zero())
     } else if info.funds.len() == 1 && info.funds[0].denom == denom {
         Ok(info.funds[0].amount)
     } else {
-        // find first mis-match
+        // find first mismatch
         let wrong = info.funds.iter().find(|c| c.denom != denom).unwrap();
         Err(PaymentError::ExtraDenom(wrong.denom.to_string()))
     }
@@ -103,10 +103,10 @@ mod test {
         let mixed_payment = message_info(&sender, &[coin(50, atom), coin(120, "wei")]);
 
         let res = may_pay(&no_payment, atom).unwrap();
-        assert_eq!(res, Uint128::zero());
+        assert_eq!(res, Uint256::zero());
 
         let res = may_pay(&atom_payment, atom).unwrap();
-        assert_eq!(res, Uint128::new(100));
+        assert_eq!(res, Uint256::new(100));
 
         let err = may_pay(&eth_payment, atom).unwrap_err();
         assert_eq!(err, PaymentError::ExtraDenom("wei".to_string()));
@@ -128,7 +128,7 @@ mod test {
         let mixed_payment = message_info(&sender, &[coin(50, atom), coin(120, "wei")]);
 
         let res = must_pay(&atom_payment, atom).unwrap();
-        assert_eq!(res, Uint128::new(100));
+        assert_eq!(res, Uint256::new(100));
 
         let err = must_pay(&no_payment, atom).unwrap_err();
         assert_eq!(err, PaymentError::NoFunds {});

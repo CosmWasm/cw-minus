@@ -8,14 +8,13 @@ workflows:
   test:
     jobs:
       - package_cw_utils_build_and_test
-      - package_cw_utils_build_minimal
       - package_cw_utils_build_maximal
       - package_controllers
       - package_cw2
       - lint:
           matrix:
             parameters:
-              rust-version: ["1.72.0", "1.76.0"]
+              rust-version: [ "1.81.0" ]
       - coverage
   nightly:
     triggers:
@@ -27,15 +26,13 @@ workflows:
               only:
                 - main
     jobs:
-      # Build with minimal versions of dependencies
-      - package_cw_utils_build_minimal
       # Build with maximal versions of dependencies
       - package_cw_utils_build_maximal
 
 jobs:
   package_cw_utils_build_and_test:
     docker:
-      - image: rust:1.72.0
+      - image: rust:1.81.0
     working_directory: ~/project/packages/cw-utils
     steps:
       - checkout
@@ -50,8 +47,8 @@ jobs:
           command: cargo update
       - restore_cache:
           keys:
-            - v3-cw-utils-rust:1.72.0-{{ checksum "~/project/Cargo.lock" }}
-            - v3-cw-utils-rust:1.72.0-
+            - v3-cw-utils-rust:1.81.0-{{ checksum "~/project/Cargo.lock" }}
+            - v3-cw-utils-rust:1.81.0-
       - run:
           name: Build library for native target
           command: cargo build --locked
@@ -68,39 +65,11 @@ jobs:
           paths:
             - /usr/local/cargo/registry
             - target
-          key: v3-cw-utils-rust:1.72.0-{{ checksum "~/project/Cargo.lock" }}
-
-  package_cw_utils_build_minimal:
-    docker:
-      - image: rustlang/rust:nightly
-    working_directory: ~/project/packages/cw-utils
-    steps:
-      - checkout
-      - run:
-          name: Version information
-          command: rustc --version; cargo --version; rustup --version; rustup target list --installed
-      - run:
-          name: Remove Cargo.lock
-          command: rm Cargo.lock
-      - restore_cache:
-          keys:
-            - v3-cw-utils-rust:1.72.0-minimal-{{ checksum "Cargo.toml" }}
-            - v3-cw-utils-rust:1.72.0-minimal-
-      - run:
-          name: Build library for native target
-          command: cargo build -Zminimal-versions --all-features
-      - run:
-          name: Run unit tests
-          command: cargo test --workspace -Zminimal-versions --all-features
-      - save_cache:
-          paths:
-            - /usr/local/cargo/registry
-            - target
-          key: v3-cw-utils-rust:1.72.0-minimal-{{ checksum "Cargo.toml" }}
+          key: v3-cw-utils-rust:1.81.0-{{ checksum "~/project/Cargo.lock" }}
 
   package_cw_utils_build_maximal:
     docker:
-      - image: rust:1.72.0
+      - image: rust:1.81.0
     working_directory: ~/project/packages/cw-utils
     steps:
       - checkout
@@ -112,8 +81,8 @@ jobs:
           command: cargo update
       - restore_cache:
           keys:
-            - v3-cw-utils-rust:1.72.0-{{ checksum "~/project/Cargo.lock" }}
-            - v3-cw-utils-rust:1.72.0-
+            - v3-cw-utils-rust:1.81.0-{{ checksum "~/project/Cargo.lock" }}
+            - v3-cw-utils-rust:1.81.0-
       - run:
           name: Build library for native target
           command: cargo build --locked --all-features
@@ -124,7 +93,7 @@ jobs:
           paths:
             - /usr/local/cargo/registry
             - target
-          key: v3-cw-utils-rust:1.72.0-{{ checksum "~/project/Cargo.lock" }}
+          key: v3-cw-utils-rust:1.81.0-{{ checksum "~/project/Cargo.lock" }}
 
   lint:
     parameters:
@@ -167,7 +136,7 @@ jobs:
   coverage:
     # https://circleci.com/developer/images?imageType=machine
     machine:
-      image: ubuntu-2004:202201-02
+      image: ubuntu-2404:2024.11.1
     steps:
       - checkout
       - run:
@@ -181,7 +150,7 @@ jobs:
 
   package_cw2:
     docker:
-      - image: rust:1.72.0
+      - image: rust:1.81.0
     working_directory: ~/project/packages/cw2
     steps:
       - checkout:
@@ -191,8 +160,8 @@ jobs:
           command: rustc --version; cargo --version; rustup --version; rustup target list --installed
       - restore_cache:
           keys:
-            - v3-cw2-rust:1.72.0-{{ checksum "~/project/Cargo.lock" }}
-            - v3-cw2-rust:1.72.0-
+            - v3-cw2-rust:1.81.0-{{ checksum "~/project/Cargo.lock" }}
+            - v3-cw2-rust:1.81.0-
       - run:
           name: Build library for native target
           command: cargo build --locked
@@ -204,11 +173,11 @@ jobs:
           paths:
             - /usr/local/cargo/registry
             - target
-          key: v3-cw2-rust:1.72.0-{{ checksum "~/project/Cargo.lock" }}
+          key: v3-cw2-rust:1.81.0-{{ checksum "~/project/Cargo.lock" }}
 
   package_controllers:
     docker:
-      - image: rust:1.72.0
+      - image: rust:1.81.0
     working_directory: ~/project/packages/controllers
     steps:
       - checkout:
@@ -218,8 +187,8 @@ jobs:
           command: rustc --version; cargo --version; rustup --version; rustup target list --installed
       - restore_cache:
           keys:
-            - v3-controllers-rust:1.72.0-{{ checksum "~/project/Cargo.lock" }}
-            - v3-controllers-rust:1.72.0-
+            - v3-controllers-rust:1.81.0-{{ checksum "~/project/Cargo.lock" }}
+            - v3-controllers-rust:1.81.0-
       - run:
           name: Build library for native target
           command: cargo build --locked
@@ -230,4 +199,4 @@ jobs:
           paths:
             - /usr/local/cargo/registry
             - target
-          key: v3-controllers-rust:1.72.0-{{ checksum "~/project/Cargo.lock" }}
+          key: v3-controllers-rust:1.81.0-{{ checksum "~/project/Cargo.lock" }}

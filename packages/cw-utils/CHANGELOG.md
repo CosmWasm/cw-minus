@@ -1,7 +1,7 @@
 # Changelog
 
-This changelog is archived and should be continued in the root of `cw-minus` repository.
 
+This changelog is archived and should be continued in the root of `cw-minus` repository.
 
 ## [v1.0.3](https://github.com/CosmWasm/cw-utils/tree/v1.0.3) (2023-11-23)
 

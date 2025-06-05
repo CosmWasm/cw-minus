@@ -1,7 +1,7 @@
 use std::{fmt, ops};
 
 use cosmwasm_schema::cw_serde;
-use cosmwasm_std::{Coin, OverflowError, OverflowOperation, StdError, StdResult, Uint128};
+use cosmwasm_std::{Coin, OverflowError, OverflowOperation, StdError, StdResult};
 
 // Balance wraps Vec<Coin> and provides some nice helpers. It mutates the Vec and can be
 // unwrapped when done.
@@ -26,7 +26,7 @@ impl NativeBalance {
     /// normalize Wallet (sorted by denom, no 0 elements, no duplicate denoms)
     pub fn normalize(&mut self) {
         // drop 0's
-        self.0.retain(|c| c.amount.u128() != 0);
+        self.0.retain(|c| !c.amount.is_zero());
         // sort
         self.0.sort_unstable_by(|a, b| a.denom.cmp(&b.denom));
 
@@ -65,7 +65,7 @@ impl NativeBalance {
     }
 
     pub fn is_empty(&self) -> bool {
-        !self.0.iter().any(|x| x.amount != Uint128::zero())
+        !self.0.iter().any(|x| !x.amount.is_zero())
     }
 
     /// similar to `Balance.sub`, but doesn't fail when minuend less than subtrahend
@@ -146,7 +146,7 @@ impl ops::Sub<Coin> for NativeBalance {
         match self.find(&other.denom) {
             Some((i, c)) => {
                 let remainder = c.amount.checked_sub(other.amount)?;
-                if remainder.u128() == 0 {
+                if remainder.is_zero() {
                     self.0.remove(i);
                 } else {
                     self.0[i].amount = remainder;
@@ -206,7 +206,7 @@ mod test {
             NativeBalance(vec![coin(555, "BTC"), coin(66666, "ETH")])
         );
 
-        // add an new coin
+        // add a new coin
         let add_atom = balance + coin(777, "ATOM");
         assert_eq!(
             add_atom,
@@ -251,7 +251,8 @@ mod test {
             NativeBalance(vec![coin(555, "BTC"), coin(10000, "ETH")])
         );
 
-        // subtract all of one coin (and remove with 0 amount)
+        // subtract all of one type of coin
+        // that should not leave a 0 amount
         let no_btc = (balance.clone() - coin(555, "BTC")).unwrap();
         assert_eq!(no_btc, NativeBalance(vec![coin(12345, "ETH")]));
 
@@ -275,7 +276,8 @@ mod test {
             NativeBalance(vec![coin(555, "BTC"), coin(10000, "ETH")])
         );
 
-        // subtract all of one coin (and remove with 0 amount)
+        // subtract all of one type of coin
+        // that should not leave a 0 amount
         let no_btc = balance.clone().sub_saturating(coin(555, "BTC")).unwrap();
         assert_eq!(no_btc, NativeBalance(vec![coin(12345, "ETH")]));
 
