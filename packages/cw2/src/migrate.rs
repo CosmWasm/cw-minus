@@ -16,7 +16,7 @@ pub fn ensure_from_older_version(
 
     if name != stored.contract {
         let msg = format!("Cannot migrate from {} to {}", stored.contract, name);
-        return Err(StdError::generic_err(msg));
+        return Err(StdError::msg(msg));
     }
 
     if storage_version > version {
@@ -24,7 +24,7 @@ pub fn ensure_from_older_version(
             "Cannot migrate from newer version ({}) to older ({})",
             stored.version, new_version
         );
-        return Err(StdError::generic_err(msg));
+        return Err(StdError::msg(msg));
     }
     if storage_version < version {
         // we don't need to save anything if migrating from the same version
@@ -35,7 +35,7 @@ pub fn ensure_from_older_version(
 }
 
 fn from_semver(err: semver::Error) -> StdError {
-    StdError::generic_err(format!("Semver: {err}"))
+    StdError::msg(format!("Semver: {err}"))
 }
 
 #[cfg(test)]

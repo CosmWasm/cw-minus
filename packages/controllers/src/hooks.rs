@@ -18,7 +18,7 @@ pub struct HooksResponse {
     pub hooks: Vec<String>,
 }
 
-#[derive(Error, Debug, PartialEq)]
+#[derive(Error, Debug)]
 pub enum HookError {
     #[error("{0}")]
     Std(#[from] StdError),

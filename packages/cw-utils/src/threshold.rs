@@ -165,7 +165,7 @@ pub enum ThresholdResponse {
     },
 }
 
-#[derive(Error, Debug, PartialEq)]
+#[derive(Error, Debug)]
 pub enum ThresholdError {
     #[error("{0}")]
     Std(#[from] StdError),

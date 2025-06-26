@@ -57,7 +57,7 @@ impl Add<Duration> for Expiration {
                 Ok(Expiration::AtHeight(h + delta))
             }
             (Expiration::Never {}, _) => Ok(Expiration::Never {}),
-            _ => Err(StdError::generic_err("Cannot add height and time")),
+            _ => Err(StdError::msg("Cannot add height and time")),
         }
     }
 }
@@ -128,7 +128,7 @@ impl Add<Duration> for Duration {
         match (self, rhs) {
             (Duration::Time(t), Duration::Time(t2)) => Ok(Duration::Time(t + t2)),
             (Duration::Height(h), Duration::Height(h2)) => Ok(Duration::Height(h + h2)),
-            _ => Err(StdError::generic_err("Cannot add height and time")),
+            _ => Err(StdError::msg("Cannot add height and time")),
         }
     }
 }

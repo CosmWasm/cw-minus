@@ -1,7 +1,7 @@
 use std::{fmt, ops};
 
 use cosmwasm_schema::cw_serde;
-use cosmwasm_std::{Coin, OverflowError, OverflowOperation, StdError, StdResult};
+use cosmwasm_std::{Coin, OverflowError, OverflowOperation, StdResult};
 
 // Balance wraps Vec<Coin> and provides some nice helpers. It mutates the Vec and can be
 // unwrapped when done.
@@ -79,11 +79,7 @@ impl NativeBalance {
                 }
             }
             // error if no tokens
-            None => {
-                return Err(StdError::overflow(OverflowError::new(
-                    OverflowOperation::Sub,
-                )))
-            }
+            None => return Err(OverflowError::new(OverflowOperation::Sub).into()),
         };
         Ok(self)
     }
@@ -153,11 +149,7 @@ impl ops::Sub<Coin> for NativeBalance {
                 }
             }
             // error if no tokens
-            None => {
-                return Err(StdError::overflow(OverflowError::new(
-                    OverflowOperation::Sub,
-                )))
-            }
+            None => return Err(OverflowError::new(OverflowOperation::Sub).into()),
         };
         Ok(self)
     }

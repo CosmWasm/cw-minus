@@ -2,9 +2,23 @@
 
 ## Unreleased
 
+## [v3.0.0](https://github.com/CosmWasm/cw-minus/tree/v3.0.0) (2025-06-26)
+
+[Full Changelog](https://github.com/CosmWasm/cw-minus/compare/v3.0.0-rc.0...v3.0.0)
+
+**Merged pull requests:**
+
+- Upgraded cosmwasm-std to v3.0.0 [\#44](https://github.com/CosmWasm/cw-minus/pull/44) ([DariuszDepta](https://github.com/DariuszDepta))
+
+## [v3.0.0-rc.0](https://github.com/CosmWasm/cw-minus/tree/v3.0.0-rc.0) (2025-06-05)
+
+[Full Changelog](https://github.com/CosmWasm/cw-minus/compare/v2.0.0-rc.0...v3.0.0-rc.0)
+
+**Merged pull requests:**
+
+- chore: Bump version 2.0.0-beta.0 [\#27](https://github.com/CosmWasm/cw-minus/pull/27) ([kulikthebird](https://github.com/kulikthebird))
 - chore: Create workspace [\#26](https://github.com/CosmWasm/cw-minus/pull/26)
-- chore: Remove CLA.md. Everything is this repo is Apache 2 licensed and there
-  is no intention to change that.
+- chore: Remove CLA.md. Everything is this repo is Apache 2 licensed and there is no intention to change that.
 
 ## [v2.0.0-rc.0](https://github.com/CosmWasm/cw-minus/tree/v2.0.0-rc.0) (2024-02-09)
 
