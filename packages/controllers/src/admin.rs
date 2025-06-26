@@ -16,7 +16,7 @@ pub struct AdminResponse {
 }
 
 /// Errors returned from Admin
-#[derive(Error, Debug, PartialEq)]
+#[derive(Error, Debug)]
 pub enum AdminError {
     #[error("{0}")]
     Std(#[from] StdError),
@@ -139,16 +139,16 @@ mod tests {
         assert!(!(control.is_admin(deps.as_ref(), &imposter).unwrap()));
         control.assert_admin(deps.as_ref(), &owner).unwrap();
         let err = control.assert_admin(deps.as_ref(), &imposter).unwrap_err();
-        assert_eq!(AdminError::NotAdmin {}, err);
+        assert!(matches!(err, AdminError::NotAdmin {}));
 
         // ensure checks proper with owner None
         control.set(deps.as_mut(), None).unwrap();
         assert!(!(control.is_admin(deps.as_ref(), &owner).unwrap()));
         assert!(!(control.is_admin(deps.as_ref(), &imposter).unwrap()));
         let err = control.assert_admin(deps.as_ref(), &owner).unwrap_err();
-        assert_eq!(AdminError::NotAdmin {}, err);
+        assert!(matches!(err, AdminError::NotAdmin {}));
         let err = control.assert_admin(deps.as_ref(), &imposter).unwrap_err();
-        assert_eq!(AdminError::NotAdmin {}, err);
+        assert!(matches!(err, AdminError::NotAdmin {}));
     }
 
     #[test]
@@ -172,7 +172,7 @@ mod tests {
         let err = control
             .execute_update_admin::<Empty, Empty>(deps.as_mut(), info, new_admin.clone())
             .unwrap_err();
-        assert_eq!(AdminError::NotAdmin {}, err);
+        assert!(matches!(err, AdminError::NotAdmin {}));
 
         // owner can update
         let info = message_info(&owner, &[]);

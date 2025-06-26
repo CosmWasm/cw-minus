@@ -9,7 +9,7 @@ be stored on disk by all contracts on `instantiate`.
 
 `ContractInfo` must be stored under the `"contract_info"` key which translates
 to `"636F6E74726163745F696E666F"` in hex format.
-Since the state is well defined, we do not need to support any "smart queries".
+Since the state is well-defined, we do not need to support any "smart queries".
 We do provide a helper to construct a "raw query" to read the ContractInfo
 of any CW2-compliant contract.
 
@@ -32,17 +32,17 @@ pub const CONTRACT: Item<ContractVersion> = Item::new("contract_info");
 
 #[cw_serde]
 pub struct ContractVersion {
-    /// contract is the crate name of the implementing contract, eg. `crate:cw20-base`
+    /// contract is the crate name of the implementing contract, e.g. `crate:cw20-base`
     /// we will use other prefixes for other languages, and their standard global namespacing
     pub contract: String,
     /// version is any string that this implementation knows. It may be simple counter "1", "2".
     /// or semantic version on release tags "v0.7.0", or some custom feature flag list.
     /// the only code that needs to understand the version parsing is code that knows how to
-    /// migrate from the given contract (and is tied to it's implementation somehow)
+    /// migrate from the given contract (and is tied to its implementation somehow)
     pub version: String,
 }
 
-#[derive(Error, Debug, PartialEq)]
+#[derive(Error, Debug)]
 pub enum VersionError {
     #[error(transparent)]
     Std(#[from] StdError),
@@ -160,18 +160,15 @@ mod tests {
 
         // error if contract version is not set
         let err = assert_contract_version(&store, EXPECTED_CONTRACT, EXPECTED_VERSION).unwrap_err();
-        assert_eq!(err, VersionError::NotFound);
+        assert!(matches!(err, VersionError::NotFound));
 
         // wrong contract name
         let wrong_contract = "crate:cw20-base";
         set_contract_version(&mut store, wrong_contract, EXPECTED_VERSION).unwrap();
         let err = assert_contract_version(&store, EXPECTED_CONTRACT, EXPECTED_VERSION).unwrap_err();
         assert_eq!(
-            err,
-            VersionError::WrongContract {
-                expected: EXPECTED_CONTRACT.into(),
-                found: wrong_contract.into()
-            },
+            "Wrong contract: expecting `crate:mars-red-bank`, found `crate:cw20-base`",
+            err.to_string()
         );
 
         // wrong contract version
@@ -179,11 +176,8 @@ mod tests {
         set_contract_version(&mut store, EXPECTED_CONTRACT, wrong_version).unwrap();
         let err = assert_contract_version(&store, EXPECTED_CONTRACT, EXPECTED_VERSION).unwrap_err();
         assert_eq!(
-            err,
-            VersionError::WrongVersion {
-                expected: EXPECTED_VERSION.into(),
-                found: wrong_version.into()
-            },
+            "Wrong contract version: expecting `1.0.0`, found `8.8.8`",
+            err.to_string()
         );
 
         // correct name and version

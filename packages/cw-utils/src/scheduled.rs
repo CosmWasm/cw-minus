@@ -45,7 +45,7 @@ impl Add<Duration> for Scheduled {
                 Ok(Scheduled::AtTime(t.plus_seconds(delta)))
             }
             (Scheduled::AtHeight(h), Duration::Height(delta)) => Ok(Scheduled::AtHeight(h + delta)),
-            _ => Err(StdError::generic_err("Cannot add height and time")),
+            _ => Err(StdError::msg("Cannot add height and time")),
         }
     }
 }
