@@ -1,7 +1,5 @@
 # Changelog
 
-## Unreleased
-
 ## [v3.0.0](https://github.com/CosmWasm/cw-minus/tree/v3.0.0) (2025-06-26)
 
 [Full Changelog](https://github.com/CosmWasm/cw-minus/compare/v3.0.0-rc.0...v3.0.0)
