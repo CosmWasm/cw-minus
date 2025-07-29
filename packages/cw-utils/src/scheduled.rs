@@ -20,8 +20,8 @@ pub enum Scheduled {
 impl fmt::Display for Scheduled {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
-            Scheduled::AtHeight(height) => write!(f, "scheduled height: {}", height),
-            Scheduled::AtTime(time) => write!(f, "scheduled time: {}", time),
+            Scheduled::AtHeight(height) => write!(f, "scheduled height: {height}"),
+            Scheduled::AtTime(time) => write!(f, "scheduled time: {time}"),
         }
     }
 }

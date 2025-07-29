@@ -43,7 +43,7 @@ mod test {
     const LIMIT: usize = 30;
 
     fn addr_from_i(i: usize) -> Addr {
-        Addr::unchecked(format!("addr{:0>8}", i))
+        Addr::unchecked(format!("addr{i:0>8}"))
     }
 
     #[test]

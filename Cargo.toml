@@ -9,8 +9,8 @@ version = "3.0.0"
 
 [workspace.dependencies]
 cw-utils = { path = "packages/cw-utils", version = "3.0.0" }
-cosmwasm-schema = "3.0.0"
-cosmwasm-std = { version = "3.0.0", default-features = false, features = ["std"] }
+cosmwasm-schema = "3.0.1"
+cosmwasm-std = { version = "3.0.1", default-features = false, features = ["std"] }
 cw-storage-plus = "3.0.0"
 thiserror = "2.0.12"
 schemars = "0.8.22"
