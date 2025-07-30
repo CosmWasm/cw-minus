@@ -23,7 +23,7 @@
 [apache-url]: LICENSE
 [notice-url]: NOTICE
 
-**Utilities for CosmWasm smart contract development**
+**Utilities for CosmWasm smart contracts development**
 
 ## Rust crates
 
