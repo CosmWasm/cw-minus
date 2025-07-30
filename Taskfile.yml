@@ -185,10 +185,28 @@ tasks:
 
   publish:
     desc: Publishes all crates in the proper order
-    prompt: This command will publish cw-utils, cw2 and cw-controllers crates. Continue?
+    prompt: You are about to publish cw-utils, cw2 and cw-controllers crates. Continue?
+    cmds:
+      - task: publish-cw-utils
+      - task: publish-cw2
+      - task: publish-cw-controllers
+
+  publish-cw-utils:
+    desc: Publishes cw-utils crate
+    prompt: Are you sure to publish cw-utils crate?
     cmds:
       - cmd: cargo publish -p cw-utils
+
+  publish-cw2:
+    desc: Publishes cw2 crate
+    prompt: Are you sure to publish cw2 crate?
+    cmds:
       - cmd: cargo publish -p cw2
+
+  publish-cw-controllers:
+    desc: Publishes cw-controllers crate
+    prompt: Are you sure to publish cw-controllers crate?
+    cmds:
       - cmd: cargo publish -p cw-controllers
 
   test:
