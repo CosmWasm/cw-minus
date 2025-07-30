@@ -1,0 +1,282 @@
+version: '3'
+
+silent: true
+
+tasks:
+
+  all:
+    desc: Runs all checks
+    summary: |
+      Runs all viable checks for cw-minus.
+      Execute this task before pushing any changes.
+      This task takes a significant amount of time to complete.
+    cmds:
+      - task: clean
+      - task: build
+      - task: clippy
+      - task: test
+      - task: wasm
+
+  build:
+    desc: Runs all building variants
+    cmds:
+      - task: build-workspace
+      - task: build-cw-utils
+      - task: build-cw2
+      - task: build-cw-controllers
+      - task: build-1-81-workspace
+
+  build-workspace:
+    desc: Builds all crates in debug mode
+    cmds:
+      - cmd: cargo +stable build --workspace
+
+  build-cw-utils:
+    desc: Builds cw-utils in debug mode
+    cmds:
+      - cmd: cargo +stable build -p cw-utils
+
+  build-cw2:
+    desc: Builds cw2 in debug mode
+    cmds:
+      - cmd: cargo +stable build -p cw2
+
+  build-cw-controllers:
+    desc: Builds cw-controllers in debug mode
+    cmds:
+      - cmd: cargo +stable build -p cw-controllers
+
+  build-1-81-workspace:
+    desc: Builds al crates in debug mode using Rust version 1.81
+    cmds:
+      - cmd: cargo +1.81.0-x86_64-unknown-linux-gnu build --workspace
+
+  clean:
+    desc: Removes all compiled artifacts
+    cmds:
+      - cmd: cargo clean
+
+  clippy:
+    desc: Runs all clippy variants
+    cmds:
+      - task: clippy-workspace
+      - task: clippy-1-81-workspace
+
+  clippy-workspace:
+    desc: Runs clippy
+    cmds:
+      - cmd: cargo +stable clippy --all-targets --workspace
+
+  clippy-1-81-workspace:
+    desc: Runs clippy using Rust version 1.81
+    cmds:
+      - cmd: cargo +1.81.0-x86_64-unknown-linux-gnu clippy --all-targets --workspace
+
+  cov:
+    desc: Generates the code coverage report for workspace in text format and prints it to stdout
+    cmds:
+      - cmd: cargo +stable llvm-cov clean
+      - cmd: cargo +stable llvm-cov --no-cfg-coverage --workspace
+
+  cov-html:
+    desc: Generates the code coverage report for workspace in HTML format and opens it in a browser
+    cmds:
+      - cmd: cargo +stable llvm-cov clean
+      - cmd: cargo +stable llvm-cov --no-cfg-coverage --workspace --html --open
+
+  cov-cw-utils:
+    desc: Generates the code coverage report for cw-utils in text format and prints it to stdout
+    cmds:
+      - cmd: cargo +stable llvm-cov clean
+      - cmd: cargo +stable llvm-cov -p cw-utils --no-cfg-coverage
+
+  cov-cw2:
+    desc: Generates the code coverage report for cw2 in text format and prints it to stdout
+    cmds:
+      - cmd: cargo +stable llvm-cov clean
+      - cmd: cargo +stable llvm-cov -p cw2 --no-cfg-coverage
+
+  cov-cw-controllers:
+    desc: Generates the code coverage report for cw-controllers in text format and prints it to stdout
+    cmds:
+      - cmd: cargo +stable llvm-cov clean
+      - cmd: cargo +stable llvm-cov -p cw-controllers --no-cfg-coverage
+
+  cov-html-cw-utils:
+    desc: Generates the code coverage report for cw-utils in HTML format and opens it in a browser
+    cmds:
+      - cmd: cargo +stable llvm-cov clean
+      - cmd: cargo +stable llvm-cov -p cw-utils --no-cfg-coverage --html --open
+
+  cov-html-cw2:
+    desc: Generates the code coverage report for cw2 in HTML format and opens it in a browser
+    cmds:
+      - cmd: cargo +stable llvm-cov clean
+      - cmd: cargo +stable llvm-cov -p cw2 --no-cfg-coverage --html --open
+
+  cov-html-cw-controllers:
+    desc: Generates the code coverage report for cw-controllers in HTML format and opens it in a browser
+    cmds:
+      - cmd: cargo +stable llvm-cov clean
+      - cmd: cargo +stable llvm-cov -p cw-controllers --no-cfg-coverage --html --open
+
+  cov-badge-cw-utils:
+    desc: Generates the detailed code coverage badge for cw-utils
+    cmds:
+      - cmd: cargo +stable llvm-cov clean
+      - cmd: cargo +stable llvm-cov --no-cfg-coverage -p cw-utils --json --summary-only --output-path ./target/coverage-cw-utils.json
+      - cmd: coverio ./target/coverage-cw-utils.json
+
+  cov-badge-cw2:
+    desc: Generates the detailed code coverage badge for cw2
+    cmds:
+      - cmd: cargo +stable llvm-cov clean
+      - cmd: cargo +stable llvm-cov --no-cfg-coverage -p cw2 --json --summary-only --output-path ./target/coverage-cw2.json
+      - cmd: coverio ./target/coverage-cw2.json
+
+  cov-badge-cw-controllers:
+    desc: Generates the detailed code coverage badge for cw-controllers
+    cmds:
+      - cmd: cargo +stable llvm-cov clean
+      - cmd: cargo +stable llvm-cov --no-cfg-coverage -p cw-controllers --json --summary-only --output-path ./target/coverage-cw-controllers.json
+      - cmd: coverio ./target/coverage-cw-controllers.json
+
+  doc-cw-utils:
+    desc: Generates documentation for cw-utils
+    cmds:
+      - cmd: cargo +stable doc -p cw-utils --no-deps
+
+  doc-cw-utils-open:
+    desc: Generates documentation for cw-utils and opens it in a browser
+    cmds:
+      - cmd: cargo +stable doc -p cw-utils --no-deps --open
+
+  doc-cw2:
+    desc: Generates documentation for cw2
+    cmds:
+      - cmd: cargo +stable doc -p cw2 --no-deps
+
+  doc-cw2-open:
+    desc: Generates documentation for cw2 and opens it in a browser
+    cmds:
+      - cmd: cargo +stable doc -p cw2 --no-deps --open
+
+  doc-cw-controllers:
+    desc: Generates documentation for cw-controllers
+    cmds:
+      - cmd: cargo +stable doc -p cw-controllers --no-deps
+
+  doc-cw-controllers-open:
+    desc: Generates documentation for cw-controllers and opens it in a browser
+    cmds:
+      - cmd: cargo +stable doc -p cw-controllers --no-deps --open
+
+  fmt:
+    desc: Runs the code formatter
+    cmds:
+      - cmd: cargo +stable fmt
+
+  publish-dry-run:
+    desc: Simulates publishing all crates (dry run)
+    cmds:
+      - cmd: cargo publish -p cw-utils --dry-run
+      - cmd: cargo publish -p cw2 --dry-run
+      - cmd: cargo publish -p cw-controllers --dry-run
+
+  publish:
+    desc: Publishes all crates in the proper order
+    prompt: You are about to publish cw-utils, cw2 and cw-controllers crates. Continue?
+    cmds:
+      - task: publish-cw-utils
+      - task: publish-cw2
+      - task: publish-cw-controllers
+
+  publish-cw-utils:
+    desc: Publishes cw-utils crate
+    prompt: Are you sure to publish cw-utils crate?
+    cmds:
+      - cmd: cargo publish -p cw-utils
+
+  publish-cw2:
+    desc: Publishes cw2 crate
+    prompt: Are you sure to publish cw2 crate?
+    cmds:
+      - cmd: cargo publish -p cw2
+
+  publish-cw-controllers:
+    desc: Publishes cw-controllers crate
+    prompt: Are you sure to publish cw-controllers crate?
+    cmds:
+      - cmd: cargo publish -p cw-controllers
+
+  test:
+    desc: Runs all test variants
+    cmds:
+      - task: test-workspace
+      - task: test-1-81-workspace
+
+  test-workspace:
+    desc: Runs test for workspace
+    cmds:
+      - cmd: cargo +stable test --workspace
+
+  test-1-81-workspace:
+    desc: Runs test for workspace using Rust version 1.81
+    cmds:
+      - cmd: cargo +1.81.0-x86_64-unknown-linux-gnu test --workspace
+
+  testn:
+    desc: Runs all test variants using nextest
+    cmds:
+      - task: testn-workspace
+      - task: testn-1-81-workspace
+
+  testn-workspace:
+    desc: Runs test for workspace using nextest
+    cmds:
+      - cmd: cargo +stable nextest run --workspace
+
+  testn-1-81-workspace:
+    desc: Runs test for workspace using nextest and Rust version 1.81
+    cmds:
+      - cmd: cargo +1.81.0-x86_64-unknown-linux-gnu nextest run --workspace
+
+  wasm:
+    desc: Runs all WASM build variants
+    cmds:
+      - task: wasm-cw-utils
+      - task: wasm-1-81-cw-utils
+      - task: wasm-cw2
+      - task: wasm-1-81-cw2
+      - task: wasm-cw-controllers
+      - task: wasm-1-81-cw-controllers
+
+  wasm-cw-utils:
+    desc: Compiles cw-utils to WebAssembly
+    cmds:
+      - cmd: cargo +stable build -p cw-utils --release --target wasm32-unknown-unknown
+
+  wasm-1-81-cw-utils:
+    desc: Compiles cw-utils to WebAssembly using Rust version 1.81
+    cmds:
+      - cmd: cargo +1.81.0-x86_64-unknown-linux-gnu build -p cw-utils --release --target wasm32-unknown-unknown
+
+  wasm-cw2:
+    desc: Compiles cw2 to WebAssembly
+    cmds:
+      - cmd: cargo +stable build -p cw2 --release --target wasm32-unknown-unknown
+
+  wasm-1-81-cw2:
+    desc: Compiles cw2 to WebAssembly using Rust version 1.81
+    cmds:
+      - cmd: cargo +1.81.0-x86_64-unknown-linux-gnu build -p cw2 --release --target wasm32-unknown-unknown
+
+  wasm-cw-controllers:
+    desc: Compiles cw-controllers to WebAssembly
+    cmds:
+      - cmd: cargo +stable build -p cw-controllers --release --target wasm32-unknown-unknown
+
+  wasm-1-81-cw-controllers:
+    desc: Compiles cw-controllers to WebAssembly using Rust version 1.81
+    cmds:
+      - cmd: cargo +1.81.0-x86_64-unknown-linux-gnu build -p cw-controllers --release --target wasm32-unknown-unknown
