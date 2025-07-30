@@ -124,22 +124,19 @@ tasks:
     desc: Generates the detailed code coverage badge for cw-utils
     cmds:
       - cmd: cargo +stable llvm-cov clean
-      - cmd: cargo +stable llvm-cov --no-cfg-coverage -p cw-utils --json --summary-only --output-path ./target/coverage-cw-utils.json
-      - cmd: coverio ./target/coverage-cw-utils.json
+      - cmd: cargo +stable llvm-cov --no-cfg-coverage -p cw-utils --json --summary-only | coverio
 
   cov-badge-cw2:
     desc: Generates the detailed code coverage badge for cw2
     cmds:
       - cmd: cargo +stable llvm-cov clean
-      - cmd: cargo +stable llvm-cov --no-cfg-coverage -p cw2 --json --summary-only --output-path ./target/coverage-cw2.json
-      - cmd: coverio ./target/coverage-cw2.json
+      - cmd: cargo +stable llvm-cov --no-cfg-coverage -p cw2 --json --summary-only | coverio
 
   cov-badge-cw-controllers:
     desc: Generates the detailed code coverage badge for cw-controllers
     cmds:
       - cmd: cargo +stable llvm-cov clean
-      - cmd: cargo +stable llvm-cov --no-cfg-coverage -p cw-controllers --json --summary-only --output-path ./target/coverage-cw-controllers.json
-      - cmd: coverio ./target/coverage-cw-controllers.json
+      - cmd: cargo +stable llvm-cov --no-cfg-coverage -p cw-controllers --json --summary-only | coverio
 
   doc-cw-utils:
     desc: Generates documentation for cw-utils
