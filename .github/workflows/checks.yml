@@ -12,7 +12,7 @@ jobs:
           toolchain: 1.81.0
           components: clippy, rustfmt
       - run: cargo fmt -- --check
-      - run: cargo clippy --all-targets --workspace -- -D warnings
+      - run: cargo clippy --workspace --all-targets -- -D warnings
 
   build-workspace:
     runs-on: ubuntu-latest
@@ -21,7 +21,35 @@ jobs:
       - uses: dtolnay/rust-toolchain@stable
         with:
           toolchain: 1.81.0
-      - run: cargo build --locked --workspace
+      - run: cargo update
+      - run: cargo build --workspace
+
+  build-cw-utils:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: 1.81.0
+      - run: cargo build -p cw-utils --locked
+
+  build-cw2:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: 1.81.0
+      - run: cargo build -p cw2 --locked
+
+  build-cw-controllers:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: 1.81.0
+      - run: cargo build -p cw-controllers --locked
 
   test-workspace:
     runs-on: ubuntu-latest
@@ -30,4 +58,32 @@ jobs:
       - uses: dtolnay/rust-toolchain@stable
         with:
           toolchain: 1.81.0
+      - run: cargo update
       - run: cargo test --workspace
+
+  test-cw-utils:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: 1.81.0
+      - run: cargo test -p cw-utils --locked
+
+  test-cw2:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: 1.81.0
+      - run: cargo test -p cw2 --locked
+
+  test-cw-controllers:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: 1.81.0
+      - run: cargo test -p cw-controllers --locked
