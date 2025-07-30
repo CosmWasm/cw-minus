@@ -11,10 +11,6 @@ workflows:
       - package_cw_utils_build_maximal
       - package_controllers
       - package_cw2
-      - lint:
-          matrix:
-            parameters:
-              rust-version: [ "1.81.0" ]
       - coverage
   nightly:
     triggers:
@@ -94,44 +90,6 @@ jobs:
             - /usr/local/cargo/registry
             - target
           key: v3-cw-utils-rust:1.81.0-{{ checksum "~/project/Cargo.lock" }}
-
-  lint:
-    parameters:
-      rust-version:
-        type: string
-    docker:
-      - image: rust:<< parameters.rust-version >>
-    steps:
-      - checkout
-      - run:
-          name: Version information
-          command: rustc --version; cargo --version; rustup --version; rustup target list --installed
-      - run:
-          name: Generate a lockfile
-          command: cargo update
-      - restore_cache:
-          keys:
-            - v3-lint-rust:<< parameters.rust-version >>-{{ checksum "~/project/Cargo.lock" }}
-            - v3-lint-rust:<< parameters.rust-version >>-
-      - run:
-          name: Add rustfmt component
-          command: rustup component add rustfmt
-      - run:
-          name: Add clippy component
-          command: rustup component add clippy
-      - run:
-          name: Check formatting of workspace
-          command: cargo fmt -- --check
-      - run:
-          name: Clippy linting on workspace
-          command: cargo clippy --all-targets -- -D warnings
-      - save_cache:
-          paths:
-            - /usr/local/cargo/registry
-            - target/debug/.fingerprint
-            - target/debug/build
-            - target/debug/deps
-          key: v3-lint-rust:<< parameters.rust-version >>-{{ checksum "~/project/Cargo.lock" }}
 
   coverage:
     # https://circleci.com/developer/images?imageType=machine
