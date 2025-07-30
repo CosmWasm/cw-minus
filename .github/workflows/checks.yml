@@ -13,3 +13,21 @@ jobs:
           components: clippy, rustfmt
       - run: cargo fmt -- --check
       - run: cargo clippy --all-targets --workspace -- -D warnings
+
+  build-workspace:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: 1.81.0
+      - run: cargo build --locked --workspace
+
+  test-workspace:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: 1.81.0
+      - run: cargo test --workspace
