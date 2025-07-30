@@ -1,7 +1,6 @@
 [workspace]
 members = ["packages/*"]
 
-# Newer resolver has to be set explicitly in virtual workspaces, see https://github.com/rust-lang/cargo/issues/9956
 resolver = "2"
 
 [workspace.package]

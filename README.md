@@ -1,7 +1,5 @@
 # CosmWasm Minus
 
-[![CircleCI](https://circleci.com/gh/CosmWasm/cw-minus/tree/main.svg?style=shield)](https://circleci.com/gh/CosmWasm/cw-minus/tree/main)
-
 [apache-url]: LICENSE
 [notice-url]: NOTICE
 
