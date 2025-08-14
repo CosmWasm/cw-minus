@@ -21,7 +21,7 @@ pub use parse_reply::{
     parse_execute_response_data, parse_instantiate_response_data, MsgExecuteContractResponse,
     MsgInstantiateContractResponse, ParseReplyError,
 };
-pub use payment::{may_pay, must_pay, nonpayable, one_coin, PaymentError};
+pub use payment::{may_pay, must_pay, must_pay_many, nonpayable, one_coin, PaymentError};
 pub use threshold::{Threshold, ThresholdError, ThresholdResponse};
 
 pub use crate::balance::NativeBalance;

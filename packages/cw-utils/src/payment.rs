@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use cosmwasm_std::{Coin, MessageInfo, Uint256};
 use thiserror::Error;
 
@@ -52,6 +54,63 @@ pub fn may_pay(info: &MessageInfo, denom: &str) -> Result<Uint256, PaymentError>
     }
 }
 
+/// Requires an exact set of denoms with amounts greater than zero.
+///
+/// This validates that:
+/// - At least one coin is provided in `info.funds`, otherwise returns [`PaymentError::NoFunds`].
+/// - The number of provided coins exactly matches the number of `required_denoms`,
+///   otherwise returns [`PaymentError::IncorrectNumberOfDenoms`].
+/// - No duplicate denoms are provided, otherwise returns [`PaymentError::DuplicateDenom`].
+/// - Every required denom is present, otherwise returns [`PaymentError::MissingDenom`].
+/// - All required denoms have a non-zero amount, otherwise returns [`PaymentError::ZeroAmountDenom`].
+///
+/// On success, returns the list of [`Coin`]s in the same order as `required_denoms`.
+///
+/// # Examples
+///
+/// ```
+/// use cosmwasm_std::{coin, testing::message_info};
+/// use cw_utils::{must_pay_many, PaymentError};
+///
+/// let sender = cosmwasm_std::Addr::unchecked("alice");
+/// let info = message_info(&sender, &[coin(50, "uatom"), coin(120, "wei")]);
+///
+/// let result = must_pay_many(&info, &["uatom", "wei"]);
+/// assert!(result.is_ok());
+/// ```
+pub fn must_pay_many(
+    info: &MessageInfo,
+    required_denoms: &[&str],
+) -> Result<Vec<Coin>, PaymentError> {
+    if info.funds.is_empty() {
+        return Err(PaymentError::NoFunds {});
+    }
+    if info.funds.len() != required_denoms.len() {
+        return Err(PaymentError::IncorrectNumberOfDenoms(required_denoms.len()));
+    }
+
+    let mut funds_map = HashMap::new();
+    for coin in &info.funds {
+        if funds_map.insert(coin.denom.as_str(), coin).is_some() {
+            return Err(PaymentError::DuplicateDenom(coin.denom.clone()));
+        }
+    }
+
+    let mut matched_coins: Vec<Coin> = Vec::new();
+    for &denom in required_denoms {
+        match funds_map.get(denom) {
+            Some(coin) => {
+                if coin.amount == Uint256::zero() {
+                    return Err(PaymentError::ZeroAmountDenom(denom.to_string()));
+                }
+                matched_coins.push((**coin).clone());
+            }
+            None => return Err(PaymentError::MissingDenom(denom.to_string())),
+        }
+    }
+    Ok(matched_coins)
+}
+
 #[derive(Error, Debug, PartialEq, Eq)]
 pub enum PaymentError {
     #[error("Must send reserve token '{0}'")]
@@ -68,6 +127,15 @@ pub enum PaymentError {
 
     #[error("This message does no accept funds")]
     NonPayable {},
+
+    #[error("Must send '{0}' denoms")]
+    IncorrectNumberOfDenoms(usize),
+
+    #[error("Zero amount sent for '{0}'")]
+    ZeroAmountDenom(String),
+
+    #[error("Received duplicate denom '{0}'")]
+    DuplicateDenom(String),
 }
 
 #[cfg(test)]
@@ -141,5 +209,38 @@ mod test {
 
         let err = must_pay(&mixed_payment, atom).unwrap_err();
         assert_eq!(err, PaymentError::MultipleDenoms {});
+    }
+
+    #[test]
+    fn test_must_pay_many_works() {
+        let deps = mock_dependencies();
+        let sender = deps.api.addr_make(SENDER);
+
+        let atom: &str = "uatom";
+        let eth: &str = "wei";
+        let no_payment = message_info(&sender, &[]);
+        let atom_payment = message_info(&sender, &coins(100, atom));
+        let zero_amount_payment = message_info(&sender, &[coin(0, atom), coin(120, eth)]);
+        let duplicate_atom_payment = message_info(&sender, &[coin(50, atom), coin(120, atom)]);
+        let eth_payment = message_info(&sender, &coins(100, eth));
+        let mixed_payment = message_info(&sender, &[coin(50, atom), coin(120, eth)]);
+
+        let err = must_pay_many(&no_payment, &[atom, eth]).unwrap_err();
+        assert_eq!(err, PaymentError::NoFunds {});
+
+        let err = must_pay_many(&atom_payment, &[atom, eth]).unwrap_err();
+        assert_eq!(err, PaymentError::IncorrectNumberOfDenoms(2));
+
+        let err = must_pay_many(&duplicate_atom_payment, &[atom, eth]).unwrap_err();
+        assert_eq!(err, PaymentError::DuplicateDenom(atom.to_string()));
+
+        let err = must_pay_many(&zero_amount_payment, &[atom, eth]).unwrap_err();
+        assert_eq!(err, PaymentError::ZeroAmountDenom(atom.to_string()));
+
+        let err = must_pay_many(&eth_payment, &[atom]).unwrap_err();
+        assert_eq!(err, PaymentError::MissingDenom(atom.to_string()));
+
+        let res = must_pay_many(&mixed_payment, &[atom, eth]).unwrap();
+        assert_eq!(res, vec![coin(50, atom), coin(120, eth)]);
     }
 }
