@@ -21,6 +21,20 @@ cw-controllers = { path = "packages/controllers" }
 cw-utils = { path = "packages/cw-utils" }
 cw2 = { path = "packages/cw2" }
 
+# Force any transitive git CosmWasm (e.g. freeze tips in cw-storage-plus) onto monorepo paths.
+[patch.'https://github.com/permissionlessweb/cosmwasm']
+cosmwasm-core = { path = "../cosmwasm/packages/core" }
+cosmwasm-crypto = { path = "../cosmwasm/packages/crypto" }
+cosmwasm-derive = { path = "../cosmwasm/packages/derive" }
+cosmwasm-schema = { path = "../cosmwasm/packages/schema" }
+cosmwasm-schema-derive = { path = "../cosmwasm/packages/schema-derive" }
+cosmwasm-std = { path = "../cosmwasm/packages/std" }
+cw-schema = { path = "../cosmwasm/packages/cw-schema" }
+cw-schema-derive = { path = "../cosmwasm/packages/cw-schema-derive" }
+
+[patch.'https://github.com/permissionlessweb/cw-storage-plus']
+cw-storage-plus = { path = "../cw-storage-plus" }
+
 [profile.release]
 rpath = false
 lto = true
