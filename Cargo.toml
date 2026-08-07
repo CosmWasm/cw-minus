@@ -7,14 +7,33 @@ resolver = "2"
 version = "3.0.0"
 
 [workspace.dependencies]
-cw-utils = { path = "packages/cw-utils", version = "3.0.0" }
-cosmwasm-schema = "3.0.1"
-cosmwasm-std = { version = "3.0.1", default-features = false, features = ["std"] }
-cw-storage-plus = "3.0.0"
-thiserror = "2.0.12"
-schemars = "0.8.22"
+cosmwasm-schema = { path = "../cosmwasm/packages/schema" }
+cosmwasm-std = { path = "../cosmwasm/packages/std" }
+cw-storage-plus = { path = "../cw-storage-plus" }
+cw-utils = { path = "packages/cw-utils" }
+schemars = "0.8.4"
 semver = { version = "1.0.26", default-features = false }
 serde = { version = "1.0.219", default-features = false, features = ["derive"] }
+thiserror = "2.0.12"
+
+[patch.'https://github.com/permissionlessweb/cw-minus']
+cw-controllers = { path = "packages/controllers" }
+cw-utils = { path = "packages/cw-utils" }
+cw2 = { path = "packages/cw2" }
+
+# Force any transitive git CosmWasm (e.g. freeze tips in cw-storage-plus) onto monorepo paths.
+[patch.'https://github.com/permissionlessweb/cosmwasm']
+cosmwasm-core = { path = "../cosmwasm/packages/core" }
+cosmwasm-crypto = { path = "../cosmwasm/packages/crypto" }
+cosmwasm-derive = { path = "../cosmwasm/packages/derive" }
+cosmwasm-schema = { path = "../cosmwasm/packages/schema" }
+cosmwasm-schema-derive = { path = "../cosmwasm/packages/schema-derive" }
+cosmwasm-std = { path = "../cosmwasm/packages/std" }
+cw-schema = { path = "../cosmwasm/packages/cw-schema" }
+cw-schema-derive = { path = "../cosmwasm/packages/cw-schema-derive" }
+
+[patch.'https://github.com/permissionlessweb/cw-storage-plus']
+cw-storage-plus = { path = "../cw-storage-plus" }
 
 [profile.release]
 rpath = false

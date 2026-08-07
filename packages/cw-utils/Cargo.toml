@@ -16,4 +16,4 @@ thiserror = { workspace = true }
 
 [dev-dependencies]
 cw-storage-plus = { workspace = true }
-prost = "0.12.1"
+prost = "0.14.3"
